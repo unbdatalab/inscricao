@@ -1,4 +1,4 @@
-const { getSupabase, checkInstitutionalEmail, isValidCPF, UFS, VINCULOS, sendConfirmation } = require('../lib/util');
+const { getSupabase, checkInstitutionalEmail, isValidCPF, UFS, VINCULOS } = require('../lib/util');
 
 const CURSO = 'gestao';
 
@@ -67,23 +67,10 @@ module.exports = async (req, res) => {
     return res.status(409).json({ status: 'full', categoria: data.categoria, message: `As vagas ${cat} para este curso estão esgotadas.` });
   }
 
-  // status ok — envia e-mail de confirmação
-  const base = (process.env.BASE_URL || `https://${req.headers.host}`).replace(/\/$/, '');
-  const link = `${base}/api/confirm?token=${data.token}`;
-  let email_sent = false;
-  try {
-    const r = await sendConfirmation(email, nome, link, data.categoria);
-    email_sent = r.sent;
-  } catch (e) {
-    console.error('mail error', e && e.message);
-  }
-
+  // status ok — inscrição registrada como PENDENTE; a confirmação é feita pela coordenação no painel
   return res.status(200).json({
     status: 'ok',
     categoria: data.categoria,
-    email_sent,
-    message: email_sent
-      ? 'Inscrição recebida! Enviamos um e-mail de confirmação — clique no link para garantir sua vaga.'
-      : 'Inscrição recebida! No momento não foi possível enviar o e-mail de confirmação; a coordenação entrará em contato.'
+    message: 'Inscrição recebida! Sua vaga está reservada e será confirmada pela coordenação. Você receberá um e-mail de confirmação quando isso ocorrer.'
   });
 };
