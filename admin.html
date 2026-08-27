@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel · Inscrições FTrails · Gestão Universitária</title>
+<style>
+  :root{--navy:#12356b;--navy-d:#0d2650;--teal:#16879b;--green:#1f8a5b;--amber:#e0a100;--ink:#1f2a44;--muted:#5b6a80;--line:#e3e9f4;--bg:#eef2fa;--card:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",system-ui,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  header{background:var(--navy);color:#fff;padding:18px 0}
+  header .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  header h1{margin:0;font-size:19px}
+  header .sub{font-size:12.5px;opacity:.85}
+  .btn{border:none;border-radius:9px;padding:9px 16px;font-weight:600;cursor:pointer;font-size:14px}
+  .btn-l{background:rgba(255,255,255,.15);color:#fff}
+  /* login */
+  .login{max-width:380px;margin:80px auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px;box-shadow:0 12px 40px rgba(18,53,107,.1)}
+  .login h2{margin:0 0 6px;color:var(--navy)}
+  .login p{color:var(--muted);font-size:14px;margin-top:0}
+  .login input{width:100%;padding:11px 13px;border:1px solid #cdd6e6;border-radius:10px;font-size:15px;margin-bottom:12px}
+  .login .btn{width:100%;background:var(--navy);color:#fff;padding:12px}
+  .login .err{color:#b23b3b;font-size:13.5px;min-height:18px}
+  /* dashboard */
+  #dash{display:none;padding:24px 0 60px}
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:16px}
+  .kpi .l{font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--teal);font-weight:700}
+  .kpi .v{font-size:28px;font-weight:800;color:var(--navy);margin-top:4px;line-height:1}
+  .kpi .s{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .kpi .bar{height:7px;border-radius:5px;background:#e7edf7;margin-top:9px;overflow:hidden}
+  .kpi .bar > i{display:block;height:100%;border-radius:5px}
+  .cols{display:grid;grid-template-columns:1.1fr .9fr;gap:22px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+  .card h3{margin:0 0 4px;color:var(--navy);font-size:16px}
+  .card .cap{color:var(--muted);font-size:13px;margin:0 0 14px}
+  /* mapa regiões */
+  .mapa{position:relative;width:100%;max-width:440px;margin:0 auto;aspect-ratio:1/1}
+  .reg{position:absolute;border-radius:14px;border:2px solid #fff;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;box-shadow:0 4px 14px rgba(18,53,107,.18);transition:transform .15s}
+  .reg:hover{transform:translateY(-2px)}
+  .reg .rn{font-size:12px;font-weight:700;opacity:.95;text-align:center;padding:0 4px}
+  .reg .rq{font-size:30px;font-weight:800;line-height:1}
+  .reg.norte{left:2%;top:6%;width:50%;height:38%}
+  .reg.nordeste{left:56%;top:10%;width:40%;height:34%}
+  .reg.centro{left:22%;top:48%;width:38%;height:26%}
+  .reg.sudeste{left:62%;top:48%;width:32%;height:28%}
+  .reg.sul{left:26%;top:78%;width:30%;height:20%}
+  .leg{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:14px;font-size:12px;color:var(--muted)}
+  .leg .sc{display:flex;height:12px;border-radius:6px;overflow:hidden;width:150px}
+  .leg .sc i{flex:1}
+  /* listas */
+  .rowbar{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:14px}
+  .rowbar .k{flex:0 0 42px;font-weight:700;color:var(--navy)}
+  .rowbar .t{flex:1;background:#eef3fb;border-radius:6px;height:20px;overflow:hidden}
+  .rowbar .t > i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--navy))}
+  .rowbar .n{flex:0 0 34px;text-align:right;font-weight:700}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.3px}
+  .tag{font-size:11.5px;padding:2px 8px;border-radius:999px;font-weight:700}
+  .tag.unb{background:#e7f0ff;color:var(--navy)}
+  .tag.externo{background:#fff2df;color:#8a6300}
+  .tag.confirmed{background:#e6f6ee;color:#146c47}
+  .tag.pending{background:#fdf0d8;color:#8a6300}
+  .muted{color:var(--muted)}
+  @media(max-width:880px){.kpis{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div><h1>Painel de Inscrições</h1><div class="sub">Curso 1 · IA na Gestão Universitária — FTrails / DataLab / UnB</div></div>
+    <div id="hdrActions" style="display:none">
+      <button class="btn btn-l" id="btnRefresh">Atualizar</button>
+      <button class="btn btn-l" id="btnSair">Sair</button>
+    </div>
+  </div>
+</header>
+
+<div id="login" class="login">
+  <h2>Acesso restrito</h2>
+  <p>Informe a senha do painel para ver as inscrições.</p>
+  <input id="pw" type="password" placeholder="Senha" autocomplete="current-password">
+  <div class="err" id="loginErr"></div>
+  <button class="btn" id="btnEntrar">Entrar</button>
+</div>
+
+<main id="dash">
+  <div class="wrap">
+    <div class="kpis" id="kpis"></div>
+    <div class="cols">
+      <div class="card">
+        <h3>Mapa de inscritos por região</h3>
+        <p class="cap">Quantidade de inscritos por região do Brasil (com base na UF informada). Intensidade da cor proporcional ao total.</p>
+        <div class="mapa" id="mapa">
+          <div class="reg norte"><div class="rn">Norte</div><div class="rq" data-r="Norte">0</div></div>
+          <div class="reg nordeste"><div class="rn">Nordeste</div><div class="rq" data-r="Nordeste">0</div></div>
+          <div class="reg centro"><div class="rn">Centro-Oeste</div><div class="rq" data-r="Centro-Oeste">0</div></div>
+          <div class="reg sudeste"><div class="rn">Sudeste</div><div class="rq" data-r="Sudeste">0</div></div>
+          <div class="reg sul"><div class="rn">Sul</div><div class="rq" data-r="Sul">0</div></div>
+        </div>
+        <div class="leg">Menos <span class="sc" id="legsc"></span> Mais</div>
+      </div>
+      <div class="card">
+        <h3>Inscritos por UF</h3>
+        <p class="cap">Unidades da federação declaradas na inscrição.</p>
+        <div id="ufList"><p class="muted">Sem dados ainda.</p></div>
+      </div>
+    </div>
+
+    <div class="cols" style="margin-top:22px">
+      <div class="card">
+        <h3>Localização detectada (IP · Vercel)</h3>
+        <p class="cap">Região aproximada de acesso, capturada automaticamente no momento da inscrição.</p>
+        <div id="ipList"><p class="muted">Sem dados ainda.</p></div>
+      </div>
+      <div class="card">
+        <h3>Últimas inscrições</h3>
+        <p class="cap">50 registros mais recentes.</p>
+        <div style="overflow:auto;max-height:360px">
+          <table id="tbl"><thead><tr><th>Nome</th><th>Instituição</th><th>UF</th><th>Cat.</th><th>Status</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  let PW = sessionStorage.getItem('ftrails_pw') || '';
+
+  const REG_COLORS = ['#cfe0f5','#8fb4e6','#4f7fc9','#2b579b','#12356b'];
+  function scaleColor(v, max){
+    if(max<=0) return '#c9d6ea';
+    const t = v/max;
+    const idx = v===0 ? 0 : Math.min(REG_COLORS.length-1, Math.ceil(t*(REG_COLORS.length-1)));
+    return REG_COLORS[idx];
+  }
+
+  function buildLegend(){
+    const sc = document.getElementById('legsc');
+    sc.innerHTML = REG_COLORS.map(c=>'<i style="background:'+c+'"></i>').join('');
+  }
+
+  function kpi(l,v,s,frac,color){
+    let bar='';
+    if(frac!=null){ bar='<div class="bar"><i style="width:'+Math.min(100,frac*100)+'%;background:'+color+'"></i></div>'; }
+    return '<div class="kpi"><div class="l">'+l+'</div><div class="v">'+v+'</div><div class="s">'+s+'</div>'+bar+'</div>';
+  }
+
+  function render(d){
+    // KPIs
+    const unbOc=(d.unb_confirmados||0)+(d.unb_pendentes||0), extOc=(d.externo_confirmados||0)+(d.externo_pendentes||0);
+    document.getElementById('kpis').innerHTML =
+      kpi('Total','' + (d.total||0), (d.confirmados||0)+' confirmados · '+(d.pendentes||0)+' pendentes') +
+      kpi('Confirmados','' + (d.confirmados||0), 'vaga garantida') +
+      kpi('Pendentes','' + (d.pendentes||0), 'aguardando confirmação') +
+      kpi('Vagas UnB', unbOc+'/80', (80-unbOc)+' restantes', unbOc/80, '#12356b') +
+      kpi('Vagas externas', extOc+'/20', (20-extOc)+' restantes', extOc/20, '#e0a100');
+
+    // Mapa por região
+    const reg = d.por_regiao || {};
+    const vals = ['Norte','Nordeste','Centro-Oeste','Sudeste','Sul'].map(r=>reg[r]||0);
+    const max = Math.max(1, ...vals);
+    document.querySelectorAll('.reg .rq').forEach(el=>{
+      const r = el.getAttribute('data-r'); const v = reg[r]||0;
+      el.textContent = v;
+      el.parentElement.style.background = scaleColor(v, max);
+    });
+
+    // UF
+    const uf = d.por_uf || [];
+    const ufMax = Math.max(1, ...uf.map(x=>x.n));
+    document.getElementById('ufList').innerHTML = uf.length ? uf.map(x=>
+      '<div class="rowbar"><div class="k">'+x.uf+'</div><div class="t"><i style="width:'+(x.n/ufMax*100)+'%"></i></div><div class="n">'+x.n+'</div></div>'
+    ).join('') : '<p class="muted">Sem dados ainda.</p>';
+
+    // IP region
+    const ir = d.por_ip_region || [];
+    const irMax = Math.max(1, ...ir.map(x=>x.n));
+    document.getElementById('ipList').innerHTML = ir.length ? ir.map(x=>
+      '<div class="rowbar"><div class="k" style="flex:0 0 auto;min-width:42px">'+(x.regiao||'—')+'</div><div class="t"><i style="width:'+(x.n/irMax*100)+'%"></i></div><div class="n">'+x.n+'</div></div>'
+    ).join('') : '<p class="muted">Sem dados ainda.</p>';
+
+    // tabela
+    const rows = (d.ultimas||[]).map(r=>{
+      const cat = r.categoria==='unb'?'<span class="tag unb">UnB</span>':'<span class="tag externo">Externo</span>';
+      const st = r.status==='confirmed'?'<span class="tag confirmed">confirmado</span>':'<span class="tag pending">pendente</span>';
+      return '<tr><td>'+esc(r.nome)+'</td><td>'+esc(r.instituicao)+'</td><td>'+esc(r.uf)+'</td><td>'+cat+'</td><td>'+st+'</td></tr>';
+    }).join('');
+    document.querySelector('#tbl tbody').innerHTML = rows || '<tr><td colspan="5" class="muted">Nenhuma inscrição ainda.</td></tr>';
+  }
+
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+  async function load(){
+    try{
+      const r = await fetch('/api/stats?pw='+encodeURIComponent(PW));
+      if(r.status===401){ logout('Senha incorreta.'); return; }
+      if(!r.ok){ throw new Error('falha'); }
+      const d = await r.json();
+      showDash(); render(d);
+    }catch(e){ document.getElementById('loginErr').textContent='Não foi possível carregar. Tente novamente.'; }
+  }
+
+  function showDash(){
+    document.getElementById('login').style.display='none';
+    document.getElementById('dash').style.display='block';
+    document.getElementById('hdrActions').style.display='block';
+  }
+  function logout(msg){
+    PW=''; sessionStorage.removeItem('ftrails_pw');
+    document.getElementById('dash').style.display='none';
+    document.getElementById('hdrActions').style.display='none';
+    document.getElementById('login').style.display='block';
+    document.getElementById('loginErr').textContent=msg||'';
+    document.getElementById('pw').value='';
+  }
+
+  document.getElementById('btnEntrar').addEventListener('click', ()=>{
+    PW = document.getElementById('pw').value.trim();
+    if(!PW){ document.getElementById('loginErr').textContent='Informe a senha.'; return; }
+    sessionStorage.setItem('ftrails_pw', PW);
+    load();
+  });
+  document.getElementById('pw').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('btnEntrar').click(); });
+  document.getElementById('btnRefresh').addEventListener('click', load);
+  document.getElementById('btnSair').addEventListener('click', ()=>logout(''));
+
+  buildLegend();
+  if(PW){ load(); }
+  setInterval(()=>{ if(PW && document.getElementById('dash').style.display==='block') load(); }, 30000);
+</script>
+</body>
+</html>
