@@ -82,6 +82,7 @@
   input:focus,select:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(22,135,155,.15)}
   .hint{font-size:12.5px;color:var(--muted)}
   .form-note{background:#f3f7ff;border:1px solid #d8e4f7;border-radius:10px;padding:12px 14px;font-size:13.5px;color:var(--navy);margin-bottom:18px}
+  .form-note.warn{background:#fff4e5;border-color:#f2d9a8;color:#8a5a00}
   .msg{margin-top:16px;padding:14px 16px;border-radius:11px;font-size:14.5px;display:none}
   .msg.ok{background:#e6f6ee;border:1px solid #b7e4cd;color:#146c47;display:block}
   .msg.err{background:#fdecec;border:1px solid #f4c4c4;color:#a13030;display:block}
@@ -211,9 +212,7 @@
     <div class="form-card">
       <h2>Inscrição</h2>
       <p class="lead" style="color:var(--muted)">Preencha os dados abaixo. Você receberá um <strong>e-mail de confirmação</strong> e sua vaga só é garantida ao clicar no link enviado.</p>
-      <div class="form-note">
-        As vagas são divididas em <strong>80 internas (e-mail @unb.br)</strong> e <strong>20 externas (demais instituições brasileiras)</strong>. A categoria é definida automaticamente pelo seu e-mail institucional.
-      </div>
+      <div class="form-note warn" id="vagaNote" style="display:none"></div>
       <form id="formInscricao" novalidate>
         <div class="form-grid">
           <div class="fld full"><label>Nome completo <span class="req">*</span></label><input name="nome" required autocomplete="name"></div>
@@ -274,6 +273,17 @@
     el.innerHTML =
       '<span class="vaga-pill">Vagas UnB: <b>'+v.unb.restantes+'</b> de '+v.unb.limite+'</span>'+
       '<span class="vaga-pill">Vagas externas: <b>'+v.externo.restantes+'</b> de '+v.externo.limite+'</span>';
+    // Aviso de esgotamento por grupo (aparece só quando um grupo zera)
+    const note = document.getElementById('vagaNote');
+    let txt = '';
+    if(v.unb.restantes<=0 && v.externo.restantes<=0){
+      txt = '⚠ As vagas deste curso estão <strong>esgotadas</strong>. Acompanhe as próximas turmas da trilha FTrails.';
+    } else if(v.unb.restantes<=0){
+      txt = '⚠ As vagas <strong>internas (@unb.br)</strong> estão esgotadas. Ainda há vagas para participantes de <strong>outras instituições brasileiras</strong>.';
+    } else if(v.externo.restantes<=0){
+      txt = '⚠ As vagas <strong>externas (outras instituições)</strong> estão esgotadas. Ainda há vagas para a <strong>comunidade UnB (@unb.br)</strong>.';
+    }
+    if(txt){ note.innerHTML = txt; note.style.display='block'; } else { note.style.display='none'; }
   }).catch(()=>{ document.getElementById('vagasLive').innerHTML=''; });
 
   // Envio do formulário
