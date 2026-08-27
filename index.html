@@ -22,7 +22,7 @@
   .brands small{font-weight:600;color:var(--muted)}
   .brand-logos{display:flex;align-items:center;gap:24px}
   .brand-logos img{display:block;width:auto}
-  .brand-logos .lg-ft{height:48px}.brand-logos .lg-dl{height:60px}.brand-logos .lg-unb{height:46px}.brand-logos .lg-alearn{height:52px}
+  .brand-logos .lg-ft{height:72px}.brand-logos .lg-dl{height:60px}.brand-logos .lg-unb{height:46px}.brand-logos .lg-alearn{height:52px}
   /* Hero */
   .hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-d) 60%,#0a1f42 100%);color:#fff;position:relative;overflow:hidden}
   .hero::after{content:"";position:absolute;right:-80px;top:-80px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(22,135,155,.35),transparent 65%)}
@@ -123,9 +123,6 @@
     <div class="cta-row">
       <a href="#inscricao" class="btn btn-primary">Fazer minha inscrição</a>
       <a href="#programa" class="btn btn-ghost">Ver o programa</a>
-    </div>
-    <div class="vagas-live" id="vagasLive">
-      <span class="vaga-pill">Carregando disponibilidade de vagas…</span>
     </div>
   </div>
 </header>
@@ -272,15 +269,11 @@
     cpf.value = v;
   });
 
-  // Disponibilidade de vagas
+  // Disponibilidade de vagas — usada apenas para o aviso de esgotamento por grupo
   fetch('/api/vagas').then(r=>r.json()).then(v=>{
-    const el = document.getElementById('vagasLive');
-    if(!v || v.error){ el.innerHTML=''; return; }
-    el.innerHTML =
-      '<span class="vaga-pill">Vagas UnB: <b>'+v.unb.restantes+'</b> de '+v.unb.limite+'</span>'+
-      '<span class="vaga-pill">Vagas externas: <b>'+v.externo.restantes+'</b> de '+v.externo.limite+'</span>';
-    // Aviso de esgotamento por grupo (aparece só quando um grupo zera)
+    if(!v || v.error) return;
     const note = document.getElementById('vagaNote');
+    if(!note) return;
     let txt = '';
     if(v.unb.restantes<=0 && v.externo.restantes<=0){
       txt = '⚠ As vagas deste curso estão <strong>esgotadas</strong>. Acompanhe as próximas turmas da trilha FTrails.';
@@ -290,7 +283,7 @@
       txt = '⚠ As vagas <strong>externas (outras instituições)</strong> estão esgotadas. Ainda há vagas para a <strong>comunidade UnB (@unb.br)</strong>.';
     }
     if(txt){ note.innerHTML = txt; note.style.display='block'; } else { note.style.display='none'; }
-  }).catch(()=>{ document.getElementById('vagasLive').innerHTML=''; });
+  }).catch(()=>{});
 
   // Envio do formulário
   const form = document.getElementById('formInscricao');
