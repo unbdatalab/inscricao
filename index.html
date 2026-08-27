@@ -77,11 +77,11 @@
   .form-card{background:#fff;color:var(--ink);border-radius:18px;padding:28px 30px;box-shadow:0 18px 50px rgba(0,0,0,.25);max-width:760px;margin:0 auto}
   .form-card h2{margin-top:0}
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  .fld{display:flex;flex-direction:column;gap:6px}
+  .fld{display:flex;flex-direction:column;gap:6px;min-width:0}
   .fld.full{grid-column:1 / -1}
   label{font-size:13.5px;font-weight:600;color:var(--ink)}
   label .req{color:#c0392b}
-  input,select{padding:11px 13px;border:1px solid #cdd6e6;border-radius:10px;font-size:15px;font-family:inherit;background:#fff;color:var(--ink)}
+  input,select{width:100%;min-width:0;max-width:100%;padding:11px 13px;border:1px solid #cdd6e6;border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--ink)}
   input:focus,select:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(22,135,155,.15)}
   .hint{font-size:12.5px;color:var(--muted)}
   .form-note{background:#f3f7ff;border:1px solid #d8e4f7;border-radius:10px;padding:12px 14px;font-size:13.5px;color:var(--navy);margin-bottom:18px}
@@ -96,8 +96,33 @@
     .facts,.datas{grid-template-columns:1fr 1fr}
     .grid2,.form-grid{grid-template-columns:1fr}
     .hero h1{font-size:27px}
+    .brand-logos{gap:18px}
+    .brand-logos .lg-ft{height:56px}.brand-logos .lg-dl{height:46px}.brand-logos .lg-unb{height:36px}.brand-logos .lg-alearn{height:40px}
   }
-  @media(max-width:480px){ .facts,.datas{grid-template-columns:1fr} }
+  @media(max-width:560px){
+    .wrap{padding:0 16px}
+    .brandbar .wrap{justify-content:center;padding:12px 16px}
+    .brand-logos{gap:16px;justify-content:center;flex-wrap:wrap}
+    .brand-logos .lg-ft{height:46px}.brand-logos .lg-dl{height:38px}.brand-logos .lg-unb{height:30px}.brand-logos .lg-alearn{height:34px}
+    .brands{justify-content:center;text-align:center;font-size:13px}
+    .hero .wrap{padding:32px 16px 30px}
+    .hero h1{font-size:23px}
+    .hero .sub{font-size:16px}
+    .hero .trilha{font-size:13px}
+    .cta-row{gap:10px}
+    .cta-row .btn{flex:1 1 100%;text-align:center}
+    .facts{grid-template-columns:1fr;margin-top:-20px}
+    .datas{grid-template-columns:1fr}
+    section{padding:26px 0}
+    h2{font-size:20px}
+    .lead{font-size:14.5px}
+    .panel{padding:18px 18px}
+    .prog-item{padding:14px;gap:12px}
+    .prog-item .n{flex-basis:40px;height:40px;font-size:15px}
+    .form-card{padding:22px 18px;border-radius:14px}
+    .submit-row{gap:12px}
+    .submit-row .btn{flex:1 1 100%;text-align:center}
+  }
 </style>
 </head>
 <body>
