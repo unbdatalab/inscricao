@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inscrições · IA na Gestão Universitária — FTrails / DataLab / UnB</title>
+<meta name="description" content="Curso de extensão gratuito: Introdução à Inteligência Artificial Aplicada à Gestão Universitária. Trilha FTrails do Laboratório de Dados da Faculdade de Tecnologia da UnB.">
+<style>
+  :root{
+    --navy:#12356b; --navy-d:#0d2650; --teal:#16879b; --green:#1f8a5b; --amber:#e0a100;
+    --ink:#1f2a44; --muted:#5b6a80; --line:#e3e9f4; --bg:#eef2fa; --card:#ffffff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6}
+  a{color:var(--navy)}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 20px}
+  /* Topbar */
+  .brandbar{background:#fff;border-bottom:1px solid var(--line)}
+  .brandbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 20px;flex-wrap:wrap}
+  .brands{display:flex;align-items:center;gap:14px;font-weight:700;color:var(--navy);font-size:14px;flex-wrap:wrap}
+  .brands .dot{width:6px;height:6px;border-radius:50%;background:var(--teal);display:inline-block}
+  .brands small{font-weight:600;color:var(--muted)}
+  /* Hero */
+  .hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-d) 60%,#0a1f42 100%);color:#fff;position:relative;overflow:hidden}
+  .hero::after{content:"";position:absolute;right:-80px;top:-80px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(22,135,155,.35),transparent 65%)}
+  .hero .wrap{position:relative;padding:44px 20px 40px}
+  .badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600;letter-spacing:.3px}
+  .badge.open{background:rgba(31,138,91,.25);border-color:rgba(120,220,170,.5)}
+  .hero h1{font-size:34px;line-height:1.18;margin:16px 0 8px;max-width:760px}
+  .hero .sub{font-size:18px;opacity:.92;max-width:680px}
+  .hero .trilha{margin-top:6px;font-size:14px;opacity:.8}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+  .btn{display:inline-block;padding:13px 26px;border-radius:11px;font-weight:700;text-decoration:none;cursor:pointer;border:none;font-size:15px}
+  .btn-primary{background:var(--green);color:#fff}
+  .btn-ghost{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.35)}
+  .vagas-live{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+  .vaga-pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);padding:8px 14px;border-radius:10px;font-size:13.5px}
+  .vaga-pill b{font-size:16px}
+  /* Quick facts */
+  .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:-28px 0 0;position:relative;z-index:3}
+  .fact{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:0 8px 26px rgba(18,53,107,.07)}
+  .fact .lbl{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--teal);font-weight:700}
+  .fact .val{font-size:16px;font-weight:700;margin-top:4px}
+  .fact .val small{display:block;font-weight:500;color:var(--muted);font-size:13px}
+  /* Sections */
+  section{padding:34px 0}
+  h2{font-size:23px;color:var(--navy);margin:0 0 6px}
+  .lead{color:var(--muted);margin:0 0 18px;max-width:760px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px}
+  .panel h3{margin:0 0 10px;color:var(--navy);font-size:17px}
+  .panel ul{margin:0;padding-left:20px}
+  .panel li{margin-bottom:7px}
+  /* Datas */
+  .datas{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .data-card{background:linear-gradient(160deg,#fff,#f5f8ff);border:1px solid var(--line);border-left:4px solid var(--navy);border-radius:12px;padding:16px}
+  .data-card .s{font-size:12px;font-weight:700;color:var(--teal);letter-spacing:.4px;text-transform:uppercase}
+  .data-card .d{font-size:22px;font-weight:800;color:var(--navy);margin:6px 0 2px}
+  .data-card .h{font-size:14px;color:var(--muted)}
+  .data-card .t{font-size:12.5px;margin-top:8px;color:var(--ink);border-top:1px dashed var(--line);padding-top:8px}
+  .data-card.oficina{border-left-color:var(--green)}
+  .data-card.oficina .d{color:var(--green)}
+  /* Programa */
+  .prog{display:flex;flex-direction:column;gap:12px}
+  .prog-item{display:flex;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .prog-item .n{flex:0 0 46px;height:46px;border-radius:12px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px}
+  .prog-item .c h4{margin:0 0 4px;color:var(--navy);font-size:15.5px}
+  .prog-item .c p{margin:0;font-size:14px;color:var(--muted)}
+  .prog-item .c .pr{margin-top:6px;font-size:13px;color:var(--green);font-weight:600}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .chip{background:#eaf1fb;color:var(--navy);border:1px solid #d3e0f5;border-radius:999px;padding:5px 13px;font-size:13px;font-weight:600}
+  /* Form */
+  .form-sec{background:linear-gradient(135deg,#0d2650,#12356b);color:#fff}
+  .form-card{background:#fff;color:var(--ink);border-radius:18px;padding:28px 30px;box-shadow:0 18px 50px rgba(0,0,0,.25);max-width:760px;margin:0 auto}
+  .form-card h2{margin-top:0}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .fld{display:flex;flex-direction:column;gap:6px}
+  .fld.full{grid-column:1 / -1}
+  label{font-size:13.5px;font-weight:600;color:var(--ink)}
+  label .req{color:#c0392b}
+  input,select{padding:11px 13px;border:1px solid #cdd6e6;border-radius:10px;font-size:15px;font-family:inherit;background:#fff;color:var(--ink)}
+  input:focus,select:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(22,135,155,.15)}
+  .hint{font-size:12.5px;color:var(--muted)}
+  .form-note{background:#f3f7ff;border:1px solid #d8e4f7;border-radius:10px;padding:12px 14px;font-size:13.5px;color:var(--navy);margin-bottom:18px}
+  .msg{margin-top:16px;padding:14px 16px;border-radius:11px;font-size:14.5px;display:none}
+  .msg.ok{background:#e6f6ee;border:1px solid #b7e4cd;color:#146c47;display:block}
+  .msg.err{background:#fdecec;border:1px solid #f4c4c4;color:#a13030;display:block}
+  .submit-row{margin-top:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  footer{background:var(--navy-d);color:#cdd7ec;padding:26px 0;font-size:13.5px}
+  footer a{color:#fff}
+  @media(max-width:820px){
+    .facts,.datas{grid-template-columns:1fr 1fr}
+    .grid2,.form-grid{grid-template-columns:1fr}
+    .hero h1{font-size:27px}
+  }
+  @media(max-width:480px){ .facts,.datas{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+
+<div class="brandbar">
+  <div class="wrap">
+    <div class="brands">
+      Faculdade de Tecnologia <span class="dot"></span> DataLab <span class="dot"></span> UnB
+    </div>
+    <div class="brands"><small>Trilha FTrails de Aprendizagem em Inteligência Artificial</small></div>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="badge open">● Matrículas abertas · Curso 1 · Gestão Universitária</span>
+    <h1>Introdução à Inteligência Artificial Aplicada à Gestão Universitária</h1>
+    <p class="sub">Formação de extensão, gratuita e remota, para usar a IA generativa como ferramenta de trabalho na gestão de instituições de ensino, pesquisa e administração pública.</p>
+    <p class="trilha">Percurso inicial · Eixo Gestão · Método DMCA (Domínio, Missão, Casos de uso e Aplicação) — DataLab / Faculdade de Tecnologia / UnB</p>
+    <div class="cta-row">
+      <a href="#inscricao" class="btn btn-primary">Fazer minha inscrição</a>
+      <a href="#programa" class="btn btn-ghost">Ver o programa</a>
+    </div>
+    <div class="vagas-live" id="vagasLive">
+      <span class="vaga-pill">Carregando disponibilidade de vagas…</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="facts">
+    <div class="fact"><div class="lbl">Carga horária</div><div class="val">40 horas<small>20h síncronas + 20h práticas</small></div></div>
+    <div class="fact"><div class="lbl">Modalidade</div><div class="val">Remota<small>ao vivo + Aprender3</small></div></div>
+    <div class="fact"><div class="lbl">Período</div><div class="val">01 a 15/09/2026<small>4 sessões, terças e sexta</small></div></div>
+    <div class="fact"><div class="lbl">Vagas</div><div class="val">100<small>80 UnB + 20 externas</small></div></div>
+  </div>
+</div>
+
+<section id="datas">
+  <div class="wrap">
+    <h2>Datas do curso</h2>
+    <p class="lead">Quatro encontros síncronos, todos das <strong>13h às 18h</strong> (horário de Brasília). Entre as sessões, cada participante realiza uma atividade prática de 5 horas aplicada à sua própria rotina de trabalho.</p>
+    <div class="datas">
+      <div class="data-card"><div class="s">Sessão 1</div><div class="d">01/09</div><div class="h">terça · 13h–18h</div><div class="t">Fundamentos, método DMCA e diagnóstico das rotinas</div></div>
+      <div class="data-card"><div class="s">Sessão 2</div><div class="d">04/09</div><div class="h">sexta · 13h–18h</div><div class="t">Escrita de prompts e Método Fractal de decomposição</div></div>
+      <div class="data-card"><div class="s">Sessão 3</div><div class="d">08/09</div><div class="h">terça · 13h–18h</div><div class="t">Assistentes personalizados e casos de uso de gestão</div></div>
+      <div class="data-card oficina"><div class="s">Sessão 4 · Oficina</div><div class="d">15/09</div><div class="h">terça · 13h–18h</div><div class="t">Criação de soluções, automação e relatórios assistidos</div></div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:8px">
+  <div class="wrap">
+    <div class="grid2">
+      <div class="panel">
+        <h3>Objetivo</h3>
+        <p>Capacitar servidores técnico-administrativos, docentes em funções de gestão e profissionais externos para o uso qualificado, ético e produtivo da inteligência artificial generativa em rotinas administrativas e de gestão, de modo que cada participante conclua a formação com <strong>ao menos uma solução aplicada ao próprio contexto de trabalho</strong>.</p>
+        <div class="chips">
+          <span class="chip">Prompt</span><span class="chip">Assistente</span><span class="chip">Agente</span>
+          <span class="chip">Método Fractal</span><span class="chip">Automação</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Para quem é</h3>
+        <ul>
+          <li><strong>Interno (UnB):</strong> servidores técnico-administrativos e docentes em cargos de gestão — direção, coordenação de curso, chefia de departamento, coordenação de programa e assessoria — e equipes de secretarias, coordenadorias e núcleos administrativos.</li>
+          <li><strong>Externo:</strong> gestores e servidores de outras instituições públicas de ensino, órgãos e autarquias, profissionais do terceiro setor e egressos da UnB em funções de gestão.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="panel" style="border-left:4px solid var(--amber)">
+      <h3>Pré-requisitos</h3>
+      <p style="margin:0">Não há exigência de formação prévia em tecnologia. É necessário <strong>computador com acesso à internet</strong> e <strong>assinatura ativa do ChatGPT (OpenAI)</strong>. Recomenda-se, de forma complementar, acesso ao <strong>Gemini</strong>, ao <strong>NotebookLM</strong> e ao <strong>Claude</strong>. A inscrição exige <strong>e-mail institucional de instituição brasileira</strong> (domínio .br); servidores da UnB usam o e-mail <strong>@unb.br</strong>.</p>
+    </div>
+  </div>
+</section>
+
+<section id="programa">
+  <div class="wrap">
+    <h2>O que vamos tratar</h2>
+    <p class="lead">O curso trabalha os três domínios de proficiência da IA generativa — prompt, assistente e agente — e as missões de tarefa, gestão e automação, sempre partindo de casos reais da gestão universitária e pública.</p>
+    <div class="prog">
+      <div class="prog-item"><div class="n">1</div><div class="c">
+        <h4>Fundamentos e diagnóstico</h4>
+        <p>Definição, panorama, fronteiras e limites da IA generativa. Método DMCA. Os três domínios (prompt, assistente, agente) e as quatro missões (tarefa, gestão, automação, solução). Diagnóstico assistido das rotinas do posto de trabalho.</p>
+        <div class="pr">Atividade A1 · Mapa de tarefas automatizáveis da unidade</div>
+      </div></div>
+      <div class="prog-item"><div class="n">2</div><div class="c">
+        <h4>Prompts e Método Fractal</h4>
+        <p>Escrita estruturada de prompts. Decomposição de problemas de gestão em blocos autossimilares. Padrões para documentos oficiais, memorandos, atas, pareceres, editais e comunicação institucional. Controle de estilo, tom e formato.</p>
+        <div class="pr">Atividade A2 · Biblioteca de prompts da unidade (mín. 10 validados)</div>
+      </div></div>
+      <div class="prog-item"><div class="n">3</div><div class="c">
+        <h4>Assistentes personalizados</h4>
+        <p>Construção de bases de conhecimento a partir de normas, manuais e regimentos. Casos de uso de gestão: triagem e resposta de demandas, indicadores, consulta a normativos e apoio à tomada de decisão. Aprendizagem ativa em equipes.</p>
+        <div class="pr">Atividade A3 · Assistente da rotina alimentado por documentos da unidade</div>
+      </div></div>
+      <div class="prog-item"><div class="n">4</div><div class="c">
+        <h4>Oficina de soluções</h4>
+        <p>Criação de aplicações de apoio à gestão, automação de tarefas e integração de fluxos. Relatórios administrativos assistidos por IA. Ética, integridade da informação, proteção de dados pessoais e governança do uso institucional.</p>
+        <div class="pr">Atividade A4 · Solução aplicada e relato técnico</div>
+      </div></div>
+    </div>
+    <p class="lead" style="margin-top:18px">A certificação de <strong>40 horas</strong> depende de frequência mínima de 75% nas sessões, da entrega das quatro atividades e da apresentação da solução final na oficina. Concluir este curso habilita o participante ao <strong>Curso 2 (uso avançado de IA)</strong> da trilha FTrails.</p>
+  </div>
+</section>
+
+<section id="inscricao" class="form-sec">
+  <div class="wrap">
+    <div class="form-card">
+      <h2>Inscrição</h2>
+      <p class="lead" style="color:var(--muted)">Preencha os dados abaixo. Você receberá um <strong>e-mail de confirmação</strong> e sua vaga só é garantida ao clicar no link enviado.</p>
+      <div class="form-note">
+        As vagas são divididas em <strong>80 internas (e-mail @unb.br)</strong> e <strong>20 externas (demais instituições brasileiras)</strong>. A categoria é definida automaticamente pelo seu e-mail institucional.
+      </div>
+      <form id="formInscricao" novalidate>
+        <div class="form-grid">
+          <div class="fld full"><label>Nome completo <span class="req">*</span></label><input name="nome" required autocomplete="name"></div>
+          <div class="fld"><label>CPF <span class="req">*</span></label><input name="cpf" inputmode="numeric" placeholder="000.000.000-00" required><span class="hint">Usado apenas para o cadastro no SIGAA.</span></div>
+          <div class="fld"><label>E-mail institucional <span class="req">*</span></label><input name="email" type="email" placeholder="voce@instituicao.br" required><span class="hint">Domínio .br. UnB: @unb.br. Não são aceitos Gmail/Outlook.</span></div>
+          <div class="fld"><label>Telefone</label><input name="telefone" inputmode="tel" placeholder="(61) 99999-9999"></div>
+          <div class="fld"><label>Instituição <span class="req">*</span></label><input name="instituicao" placeholder="Ex.: Universidade de Brasília" required></div>
+          <div class="fld"><label>Vínculo <span class="req">*</span></label>
+            <select name="vinculo" required>
+              <option value="">Selecione…</option>
+              <option value="tae">Servidor(a) técnico-administrativo(a)</option>
+              <option value="docente-gestor">Docente em função de gestão</option>
+              <option value="externo">Gestor(a) / servidor(a) de outra instituição</option>
+              <option value="egresso">Egresso(a) da UnB em função de gestão</option>
+              <option value="outro">Outro</option>
+            </select>
+          </div>
+          <div class="fld"><label>Cargo / função</label><input name="cargo" placeholder="Ex.: Coordenador(a) administrativo(a)"></div>
+          <div class="fld"><label>UF <span class="req">*</span></label>
+            <select name="uf" required>
+              <option value="">UF…</option>
+              <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option>
+            </select>
+          </div>
+          <div class="fld"><label>Município</label><input name="municipio" placeholder="Ex.: Brasília"></div>
+        </div>
+        <div class="submit-row">
+          <button type="submit" class="btn btn-primary" id="btnSubmit">Enviar inscrição</button>
+          <span class="hint">Ao enviar, você concorda com o uso dos dados para fins do cadastro e gestão desta ação de extensão.</span>
+        </div>
+        <div class="msg" id="msg"></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <strong>Trilha FTrails de Aprendizagem em Inteligência Artificial</strong><br>
+    Laboratório de Dados (DataLab) · Faculdade de Tecnologia · Universidade de Brasília<br>
+    Coordenação: Prof. Dr. Ari Melo Mariano · <a href="mailto:arimariano@unb.br">arimariano@unb.br</a>
+  </div>
+</footer>
+
+<script>
+  // Máscara simples de CPF
+  const cpf = document.querySelector('input[name=cpf]');
+  cpf.addEventListener('input', () => {
+    let v = cpf.value.replace(/\D/g,'').slice(0,11);
+    v = v.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+    cpf.value = v;
+  });
+
+  // Disponibilidade de vagas
+  fetch('/api/vagas').then(r=>r.json()).then(v=>{
+    const el = document.getElementById('vagasLive');
+    if(!v || v.error){ el.innerHTML=''; return; }
+    el.innerHTML =
+      '<span class="vaga-pill">Vagas UnB: <b>'+v.unb.restantes+'</b> de '+v.unb.limite+'</span>'+
+      '<span class="vaga-pill">Vagas externas: <b>'+v.externo.restantes+'</b> de '+v.externo.limite+'</span>';
+  }).catch(()=>{ document.getElementById('vagasLive').innerHTML=''; });
+
+  // Envio do formulário
+  const form = document.getElementById('formInscricao');
+  const msg = document.getElementById('msg');
+  const btn = document.getElementById('btnSubmit');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    msg.className='msg'; msg.style.display='none';
+    const data = Object.fromEntries(new FormData(form).entries());
+    btn.disabled = true; btn.textContent = 'Enviando…';
+    try{
+      const r = await fetch('/api/register', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)
+      });
+      const j = await r.json();
+      if(j.status === 'ok'){
+        msg.className='msg ok';
+        msg.innerHTML = '✔ '+j.message+'<br><small>Não recebeu? Verifique a caixa de spam/lixo eletrônico.</small>';
+        form.reset();
+      } else {
+        msg.className='msg err';
+        msg.textContent = '⚠ '+(j.message || 'Não foi possível concluir a inscrição.');
+      }
+    }catch(err){
+      msg.className='msg err';
+      msg.textContent = '⚠ Falha de conexão. Tente novamente em instantes.';
+    }finally{
+      btn.disabled=false; btn.textContent='Enviar inscrição';
+      msg.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  });
+</script>
+</body>
+</html>
