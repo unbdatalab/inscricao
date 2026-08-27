@@ -1,0 +1,10 @@
+{
+  "name": "ftrails-inscricao",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sistema de inscrição da Trilha FTrails de Aprendizagem em IA — DataLab/FT/UnB",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "nodemailer": "^6.9.15"
+  }
+}
