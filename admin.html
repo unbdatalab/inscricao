@@ -64,6 +64,12 @@
   .tag.confirmed{background:#e6f6ee;color:#146c47}
   .tag.pending{background:#fdf0d8;color:#8a6300}
   .muted{color:var(--muted)}
+  .em{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .acts{white-space:nowrap}
+  .abtn{border:none;border-radius:7px;padding:5px 11px;font-size:12.5px;font-weight:700;cursor:pointer;margin-right:6px;font-family:inherit}
+  .abtn.ok{background:#1f8a5b;color:#fff}
+  .abtn.no{background:#f3f5f9;color:#8a3030;border:1px solid #e6c6c6}
+  .abtn:disabled{opacity:.5;cursor:default}
   @media(max-width:880px){.kpis{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}}
 </style>
 </head>
@@ -119,7 +125,7 @@
         <h3>Últimas inscrições</h3>
         <p class="cap">50 registros mais recentes.</p>
         <div style="overflow:auto;max-height:360px">
-          <table id="tbl"><thead><tr><th>Nome</th><th>Instituição</th><th>UF</th><th>Cat.</th><th>Status</th></tr></thead><tbody></tbody></table>
+          <table id="tbl"><thead><tr><th>Nome / e-mail</th><th>Instituição</th><th>UF</th><th>Cat.</th><th>Status</th><th>Ações</th></tr></thead><tbody></tbody></table>
         </div>
       </div>
     </div>
@@ -186,9 +192,12 @@
     const rows = (d.ultimas||[]).map(r=>{
       const cat = r.categoria==='unb'?'<span class="tag unb">UnB</span>':'<span class="tag externo">Externo</span>';
       const st = r.status==='confirmed'?'<span class="tag confirmed">confirmado</span>':'<span class="tag pending">pendente</span>';
-      return '<tr><td>'+esc(r.nome)+'</td><td>'+esc(r.instituicao)+'</td><td>'+esc(r.uf)+'</td><td>'+cat+'</td><td>'+st+'</td></tr>';
+      const acoes = r.status==='pending'
+        ? '<button class="abtn ok" data-id="'+r.id+'" data-a="confirmar">Confirmar</button><button class="abtn no" data-id="'+r.id+'" data-a="cancelar">Cancelar</button>'
+        : '<button class="abtn no" data-id="'+r.id+'" data-a="cancelar">Cancelar</button>';
+      return '<tr><td>'+esc(r.nome)+'<div class="em">'+esc(r.email)+'</div></td><td>'+esc(r.instituicao)+'</td><td>'+esc(r.uf)+'</td><td>'+cat+'</td><td>'+st+'</td><td class="acts">'+acoes+'</td></tr>';
     }).join('');
-    document.querySelector('#tbl tbody').innerHTML = rows || '<tr><td colspan="5" class="muted">Nenhuma inscrição ainda.</td></tr>';
+    document.querySelector('#tbl tbody').innerHTML = rows || '<tr><td colspan="6" class="muted">Nenhuma inscrição ainda.</td></tr>';
   }
 
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -226,6 +235,23 @@
   document.getElementById('pw').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('btnEntrar').click(); });
   document.getElementById('btnRefresh').addEventListener('click', load);
   document.getElementById('btnSair').addEventListener('click', ()=>logout(''));
+
+  async function doAction(id, action, btn){
+    if(action==='cancelar' && !confirm('Cancelar esta inscrição? A vaga será liberada.')) return;
+    const row = btn.closest('tr');
+    [...row.querySelectorAll('.abtn')].forEach(b=>b.disabled=true);
+    try{
+      const r = await fetch('/api/admin-action', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({pw:PW, id, action})});
+      if(r.status===401){ logout('Senha incorreta.'); return; }
+      const j = await r.json();
+      if(j.status!=='ok'){ alert('Não foi possível concluir: '+(j.error||'erro')); [...row.querySelectorAll('.abtn')].forEach(b=>b.disabled=false); return; }
+      load();
+    }catch(e){ alert('Falha de conexão. Tente novamente.'); [...row.querySelectorAll('.abtn')].forEach(b=>b.disabled=false); }
+  }
+  document.getElementById('tbl').addEventListener('click', e=>{
+    const b = e.target.closest('.abtn'); if(!b) return;
+    doAction(b.getAttribute('data-id'), b.getAttribute('data-a'), b);
+  });
 
   buildLegend();
   if(PW){ load(); }
