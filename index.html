@@ -20,6 +20,9 @@
   .brands{display:flex;align-items:center;gap:14px;font-weight:700;color:var(--navy);font-size:14px;flex-wrap:wrap}
   .brands .dot{width:6px;height:6px;border-radius:50%;background:var(--teal);display:inline-block}
   .brands small{font-weight:600;color:var(--muted)}
+  .brand-logos{display:flex;align-items:center;gap:24px}
+  .brand-logos img{display:block;width:auto}
+  .brand-logos .lg-ft{height:34px}.brand-logos .lg-dl{height:44px}.brand-logos .lg-unb{height:32px}
   /* Hero */
   .hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-d) 60%,#0a1f42 100%);color:#fff;position:relative;overflow:hidden}
   .hero::after{content:"";position:absolute;right:-80px;top:-80px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(22,135,155,.35),transparent 65%)}
@@ -101,8 +104,10 @@
 
 <div class="brandbar">
   <div class="wrap">
-    <div class="brands">
-      Faculdade de Tecnologia <span class="dot"></span> DataLab <span class="dot"></span> UnB
+    <div class="brand-logos">
+      <img class="lg-ft" src="ft.png" alt="Faculdade de Tecnologia">
+      <img class="lg-dl" src="datalab.png" alt="DataLab">
+      <img class="lg-unb" src="unb.png" alt="UnB">
     </div>
     <div class="brands"><small>Trilha FTrails de Aprendizagem em Inteligência Artificial</small></div>
   </div>
