@@ -38,3 +38,6 @@ Sistema de inscrição do **Curso 1 · Introdução à Inteligência Artificial 
 ## Banco de dados
 
 Tabela `ftrails_registrations` e funções `ftrails_register`, `ftrails_confirm`, `ftrails_stats`, `ftrails_regiao` no schema `public` do projeto Supabase (sa-east-1). As funções são `security definer` e só podem ser executadas pela `service_role`.
+
+
+<!-- Deploy de produção: 2026-08-27 -->
