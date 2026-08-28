@@ -35,17 +35,12 @@
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
   .card h3{margin:0 0 4px;color:var(--navy);font-size:16px}
   .card .cap{color:var(--muted);font-size:13px;margin:0 0 14px}
-  /* mapa regiões */
-  .mapa{position:relative;width:100%;max-width:440px;margin:0 auto;aspect-ratio:1/1}
-  .reg{position:absolute;border-radius:14px;border:2px solid #fff;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;box-shadow:0 4px 14px rgba(18,53,107,.18);transition:transform .15s}
-  .reg:hover{transform:translateY(-2px)}
-  .reg .rn{font-size:12px;font-weight:700;opacity:.95;text-align:center;padding:0 4px}
-  .reg .rq{font-size:30px;font-weight:800;line-height:1}
-  .reg.norte{left:2%;top:6%;width:50%;height:38%}
-  .reg.nordeste{left:56%;top:10%;width:40%;height:34%}
-  .reg.centro{left:22%;top:48%;width:38%;height:26%}
-  .reg.sudeste{left:62%;top:48%;width:32%;height:28%}
-  .reg.sul{left:26%;top:78%;width:30%;height:20%}
+  /* mapa regiões (SVG do Brasil) */
+  .mapa{width:100%;max-width:380px;margin:0 auto}
+  .mapa svg{width:100%;height:auto;display:block}
+  .mapa .rp{stroke:#fff;stroke-width:2.2;transition:fill .25s}
+  .mapa .rn{font:700 11px "Segoe UI",Arial;fill:#fff;paint-order:stroke;stroke:#0d2650;stroke-width:3px;stroke-linejoin:round}
+  .mapa .rq{font:800 21px "Segoe UI",Arial;fill:#fff;paint-order:stroke;stroke:#0d2650;stroke-width:3.2px;stroke-linejoin:round}
   .leg{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:14px;font-size:12px;color:var(--muted)}
   .leg .sc{display:flex;height:12px;border-radius:6px;overflow:hidden;width:150px}
   .leg .sc i{flex:1}
@@ -100,11 +95,25 @@
         <h3>Mapa de inscritos por região</h3>
         <p class="cap">Quantidade de inscritos por região do Brasil (com base na UF informada). Intensidade da cor proporcional ao total.</p>
         <div class="mapa" id="mapa">
-          <div class="reg norte"><div class="rn">Norte</div><div class="rq" data-r="Norte">0</div></div>
-          <div class="reg nordeste"><div class="rn">Nordeste</div><div class="rq" data-r="Nordeste">0</div></div>
-          <div class="reg centro"><div class="rn">Centro-Oeste</div><div class="rq" data-r="Centro-Oeste">0</div></div>
-          <div class="reg sudeste"><div class="rn">Sudeste</div><div class="rq" data-r="Sudeste">0</div></div>
-          <div class="reg sul"><div class="rn">Sul</div><div class="rq" data-r="Sul">0</div></div>
+          <svg viewBox="0 0 400 440" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mapa de inscritos por região do Brasil">
+            <path class="rp" data-r="Norte" fill="#c9d6ea" d="M95,70 L150,45 L205,58 L255,52 L300,92 L286,150 L256,232 L150,246 L120,300 L62,290 L94,238 L78,180 L96,118 Z"/>
+            <path class="rp" data-r="Nordeste" fill="#c9d6ea" d="M300,92 L352,150 L378,202 L360,250 L298,262 L256,232 L286,150 Z"/>
+            <path class="rp" data-r="Centro-Oeste" fill="#c9d6ea" d="M150,246 L256,232 L298,262 L258,320 L185,345 L120,300 Z"/>
+            <path class="rp" data-r="Sudeste" fill="#c9d6ea" d="M298,262 L360,250 L335,298 L305,335 L270,356 L258,320 Z"/>
+            <path class="rp" data-r="Sul" fill="#c9d6ea" d="M185,345 L258,320 L270,356 L255,400 L230,432 L184,406 L150,360 Z"/>
+            <g pointer-events="none">
+              <text class="rn" x="178" y="153" text-anchor="middle">Norte</text>
+              <text class="rq" id="rq-Norte" x="178" y="173" text-anchor="middle">0</text>
+              <text class="rn" x="322" y="189" text-anchor="middle">Nordeste</text>
+              <text class="rq" id="rq-Nordeste" x="322" y="209" text-anchor="middle">0</text>
+              <text class="rn" x="205" y="281" text-anchor="middle">Centro-Oeste</text>
+              <text class="rq" id="rq-Centro-Oeste" x="205" y="301" text-anchor="middle">0</text>
+              <text class="rn" x="308" y="300" text-anchor="middle">Sudeste</text>
+              <text class="rq" id="rq-Sudeste" x="308" y="319" text-anchor="middle">0</text>
+              <text class="rn" x="216" y="371" text-anchor="middle">Sul</text>
+              <text class="rq" id="rq-Sul" x="216" y="391" text-anchor="middle">0</text>
+            </g>
+          </svg>
         </div>
         <div class="leg">Menos <span class="sc" id="legsc"></span> Mais</div>
       </div>
@@ -166,12 +175,15 @@
 
     // Mapa por região
     const reg = d.por_regiao || {};
-    const vals = ['Norte','Nordeste','Centro-Oeste','Sudeste','Sul'].map(r=>reg[r]||0);
+    const REGS = ['Norte','Nordeste','Centro-Oeste','Sudeste','Sul'];
+    const vals = REGS.map(r=>reg[r]||0);
     const max = Math.max(1, ...vals);
-    document.querySelectorAll('.reg .rq').forEach(el=>{
-      const r = el.getAttribute('data-r'); const v = reg[r]||0;
-      el.textContent = v;
-      el.parentElement.style.background = scaleColor(v, max);
+    REGS.forEach(r=>{
+      const v = reg[r]||0;
+      const p = document.querySelector('.rp[data-r="'+r+'"]');
+      if(p) p.setAttribute('fill', scaleColor(v, max));
+      const t = document.getElementById('rq-'+r);
+      if(t) t.textContent = v;
     });
 
     // UF
