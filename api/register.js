@@ -21,10 +21,19 @@ module.exports = async (req, res) => {
   const cargo = String(body.cargo || '').trim();
   const uf = String(body.uf || '').trim().toUpperCase();
   const municipio = String(body.municipio || '').trim();
+  const dataNascimento = String(body.data_nascimento || '').trim();
+  const usaNomeSocial = body.usa_nome_social === true || body.usa_nome_social === 'sim' || body.usa_nome_social === 'true';
+  const nomeSocial = String(body.nome_social || '').trim();
+  const cep = String(body.cep || '').trim();
+  const logradouro = String(body.logradouro || '').trim();
+  const numero = String(body.numero || '').trim();
+  const bairro = String(body.bairro || '').trim();
+  const complemento = String(body.complemento || '').trim();
 
   // Validações
   if (nome.length < 3) return res.status(400).json({ status: 'error', field: 'nome', message: 'Informe seu nome completo.' });
   if (!isValidCPF(cpf)) return res.status(400).json({ status: 'error', field: 'cpf', message: 'CPF inválido.' });
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dataNascimento)) return res.status(400).json({ status: 'error', field: 'data_nascimento', message: 'Informe sua data de nascimento.' });
   const chk = checkInstitutionalEmail(email);
   if (!chk.ok) {
     const msg = chk.reason === 'gratuito'
@@ -34,9 +43,16 @@ module.exports = async (req, res) => {
         : 'E-mail inválido.';
     return res.status(400).json({ status: 'error', field: 'email', message: msg });
   }
+  if (telefone.replace(/\D/g, '').length < 10) return res.status(400).json({ status: 'error', field: 'telefone', message: 'Informe um telefone/celular com DDD.' });
+  if (usaNomeSocial && nomeSocial.length < 2) return res.status(400).json({ status: 'error', field: 'nome_social', message: 'Informe o nome social.' });
   if (instituicao.length < 2) return res.status(400).json({ status: 'error', field: 'instituicao', message: 'Informe sua instituição.' });
   if (!VINCULOS.includes(vinculo)) return res.status(400).json({ status: 'error', field: 'vinculo', message: 'Selecione seu vínculo.' });
+  if (cep.replace(/\D/g, '').length !== 8) return res.status(400).json({ status: 'error', field: 'cep', message: 'Informe um CEP válido (8 dígitos).' });
+  if (logradouro.length < 2) return res.status(400).json({ status: 'error', field: 'logradouro', message: 'Informe a rua/avenida.' });
+  if (numero.length < 1) return res.status(400).json({ status: 'error', field: 'numero', message: 'Informe o número.' });
+  if (bairro.length < 2) return res.status(400).json({ status: 'error', field: 'bairro', message: 'Informe o bairro.' });
   if (!UFS.includes(uf)) return res.status(400).json({ status: 'error', field: 'uf', message: 'Selecione a UF.' });
+  if (municipio.length < 2) return res.status(400).json({ status: 'error', field: 'municipio', message: 'Informe o município.' });
 
   // Geolocalização a partir dos headers da Vercel
   const ip_country = req.headers['x-vercel-ip-country'] || null;
@@ -51,7 +67,9 @@ module.exports = async (req, res) => {
   const { data, error } = await supabase.rpc('ftrails_register', {
     p_curso: CURSO, p_nome: nome, p_cpf: cpf, p_email: email, p_telefone: telefone,
     p_instituicao: instituicao, p_vinculo: vinculo, p_cargo: cargo, p_uf: uf, p_municipio: municipio,
-    p_ip_region: ip_region, p_ip_country: ip_country, p_ip_city: ip_city
+    p_ip_region: ip_region, p_ip_country: ip_country, p_ip_city: ip_city,
+    p_data_nascimento: dataNascimento, p_usa_nome_social: usaNomeSocial, p_nome_social: nomeSocial,
+    p_cep: cep, p_logradouro: logradouro, p_numero: numero, p_bairro: bairro, p_complemento: complemento
   });
 
   if (error) {
