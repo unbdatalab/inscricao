@@ -146,7 +146,7 @@
     <p class="sub">Formação de extensão, gratuita e remota, para usar a IA generativa como ferramenta de trabalho na gestão de instituições de ensino, pesquisa e administração pública.</p>
     <p class="trilha">Percurso inicial · Eixo Gestão · Método DMCA (Domínio, Missão, Casos de uso e Aplicação) — DataLab / Faculdade de Tecnologia / UnB</p>
     <div class="cta-row">
-      <a href="#inscricao" class="btn btn-primary">Fazer minha inscrição</a>
+      <a href="#inscricao" class="btn btn-primary">Fazer minha pré-inscrição</a>
       <a href="#programa" class="btn btn-ghost">Ver o programa</a>
     </div>
   </div>
@@ -238,8 +238,8 @@
 <section id="inscricao" class="form-sec">
   <div class="wrap">
     <div class="form-card">
-      <h2>Inscrição</h2>
-      <p class="lead" style="color:var(--muted)">Preencha os dados abaixo. Sua vaga fica <strong>reservada</strong> e será <strong>confirmada pela coordenação</strong>; você receberá um e-mail de confirmação assim que isso ocorrer.</p>
+      <h2>Pré-inscrição</h2>
+      <p class="lead" style="color:var(--muted)">Preencha os dados abaixo para realizar sua <strong>pré-inscrição</strong>. Sua vaga fica <strong>reservada</strong> e será <strong>confirmada pela coordenação</strong>; você receberá um e-mail de confirmação nos próximos dias.</p>
       <div class="form-note warn" id="vagaNote" style="display:none"></div>
       <form id="formInscricao" novalidate>
         <div class="form-grid">
@@ -268,7 +268,7 @@
           <div class="fld"><label>Município</label><input name="municipio" placeholder="Ex.: Brasília"></div>
         </div>
         <div class="submit-row">
-          <button type="submit" class="btn btn-primary" id="btnSubmit">Enviar inscrição</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmit">Enviar pré-inscrição</button>
           <span class="hint">Ao enviar, você concorda com o uso dos dados para fins do cadastro e gestão desta ação de extensão.</span>
         </div>
         <div class="msg" id="msg"></div>
@@ -326,17 +326,17 @@
       const j = await r.json();
       if(j.status === 'ok'){
         msg.className='msg ok';
-        msg.innerHTML = '✔ '+j.message+'<br><small>Não recebeu? Verifique a caixa de spam/lixo eletrônico.</small>';
+        msg.innerHTML = '✔ <strong>Pré-inscrição realizada com sucesso!</strong><br>Aguarde a confirmação no e-mail nos próximos dias.';
         form.reset();
       } else {
         msg.className='msg err';
-        msg.textContent = '⚠ '+(j.message || 'Não foi possível concluir a inscrição.');
+        msg.textContent = '⚠ '+(j.message || 'Não foi possível concluir a pré-inscrição.');
       }
     }catch(err){
       msg.className='msg err';
       msg.textContent = '⚠ Falha de conexão. Tente novamente em instantes.';
     }finally{
-      btn.disabled=false; btn.textContent='Enviar inscrição';
+      btn.disabled=false; btn.textContent='Enviar pré-inscrição';
       msg.scrollIntoView({behavior:'smooth', block:'center'});
     }
   });
