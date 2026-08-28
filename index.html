@@ -82,8 +82,9 @@
   .subhead{grid-column:1 / -1;font-weight:700;color:var(--navy);font-size:14px;margin:8px 0 -2px;border-top:1px solid var(--line);padding-top:16px}
   label{font-size:13.5px;font-weight:600;color:var(--ink)}
   label .req{color:#c0392b}
-  input,select{width:100%;min-width:0;max-width:100%;padding:11px 13px;border:1px solid #cdd6e6;border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--ink)}
-  input:focus,select:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(22,135,155,.15)}
+  input,select,textarea{width:100%;min-width:0;max-width:100%;padding:11px 13px;border:1px solid #cdd6e6;border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--ink)}
+  textarea{resize:vertical;min-height:100px;line-height:1.5}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(22,135,155,.15)}
   .hint{font-size:12.5px;color:var(--muted)}
   .form-note{background:#f3f7ff;border:1px solid #d8e4f7;border-radius:10px;padding:12px 14px;font-size:13.5px;color:var(--navy);margin-bottom:18px}
   .form-note.warn{background:#fff4e5;border-color:#f2d9a8;color:#8a5a00}
@@ -247,7 +248,7 @@
           <div class="fld full"><label>Nome completo <span class="req">*</span></label><input name="nome" required autocomplete="name"></div>
           <div class="fld"><label>CPF <span class="req">*</span></label><input name="cpf" inputmode="numeric" placeholder="000.000.000-00" required><span class="hint">Usado para o cadastro no SIGAA.</span></div>
           <div class="fld"><label>Data de nascimento <span class="req">*</span></label><input name="data_nascimento" type="date" required></div>
-          <div class="fld"><label>E-mail institucional <span class="req">*</span></label><input name="email" type="email" placeholder="voce@instituicao.br" required><span class="hint">Domínio .br. UnB: @unb.br. Não são aceitos Gmail/Outlook.</span></div>
+          <div class="fld"><label>E-mail <span class="req">*</span></label><input name="email" type="email" placeholder="voce@email.com" required><span class="hint">Comunidade UnB: use <strong>@unb.br</strong> (vaga interna). Demais participantes: qualquer e-mail (vaga externa).</span></div>
           <div class="fld"><label>Telefone / Celular <span class="req">*</span></label><input name="telefone" inputmode="tel" placeholder="(61) 99999-9999" required></div>
           <div class="fld"><label>Deseja usar nome social? <span class="req">*</span></label>
             <select name="usa_nome_social" id="usaNomeSocial">
@@ -282,6 +283,8 @@
             </select>
           </div>
           <div class="fld"><label>Município <span class="req">*</span></label><input name="municipio" placeholder="Ex.: Brasília" required></div>
+          <div class="subhead">Sobre sua experiência</div>
+          <div class="fld full"><label>Qual é a maior dor (desafio) que você enfrenta hoje na gestão universitária? <span class="req">*</span></label><textarea name="desafio" rows="4" placeholder="Responda em uma ou duas frases — suas palavras nos ajudam a desenhar o curso." required></textarea></div>
         </div>
         <div class="submit-row">
           <button type="submit" class="btn btn-primary" id="btnSubmit">Enviar pré-inscrição</button>

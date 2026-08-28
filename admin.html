@@ -73,6 +73,10 @@
   .comm textarea{resize:vertical;min-height:96px}
   .comm .btn{background:var(--navy);color:#fff}
   .comm .btn.sec{background:#eef3fb;color:var(--navy);border:1px solid #d3e0f5}
+  /* mapa de palavras */
+  .wc{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:center;padding:14px 6px;line-height:1.15;min-height:120px}
+  .wc span{font-weight:800;white-space:nowrap;transition:opacity .15s}
+  .wc span:hover{opacity:.7}
   .cResult{display:none;margin-top:14px;padding:11px 14px;border-radius:9px;font-size:13.5px;background:#e6f6ee;border:1px solid #b7e4cd;color:#146c47}
   .cResult.warn{background:#fff4e5;border-color:#f2d9a8;color:#8a5a00}
   @media(max-width:880px){.kpis{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}.msgcols{grid-template-columns:1fr}}
@@ -133,6 +137,12 @@
         <p class="cap">Unidades da federação declaradas na inscrição.</p>
         <div id="ufList"><p class="muted">Sem dados ainda.</p></div>
       </div>
+    </div>
+
+    <div class="card" style="margin-top:22px">
+      <h3>Mapa de palavras — desafios na gestão</h3>
+      <p class="cap">Palavras mais citadas na resposta "maior dor na gestão universitária". O tamanho é proporcional à frequência.</p>
+      <div class="wc" id="wc"><p class="muted">Sem respostas ainda.</p></div>
     </div>
 
     <div class="card comm" style="margin-top:22px">
@@ -258,7 +268,7 @@
       if(r.status===401){ logout('Senha incorreta.'); return; }
       if(!r.ok){ throw new Error('falha'); }
       const d = await r.json();
-      showDash(); render(d);
+      showDash(); render(d); loadWordcloud();
     }catch(e){ document.getElementById('loginErr').textContent='Não foi possível carregar. Tente novamente.'; }
   }
 
@@ -305,6 +315,27 @@
     finally{ btn.disabled=false; btn.textContent=old; }
   }
   document.getElementById('btnExport').addEventListener('click', exportExcel);
+
+  // ----- Mapa de palavras -----
+  async function loadWordcloud(){
+    try{
+      const r=await fetch('/api/wordcloud',{headers:{'x-admin-password':PW}});
+      if(!r.ok) return;
+      const j=await r.json(); renderWordcloud(j.words||[]);
+    }catch(e){}
+  }
+  function renderWordcloud(words){
+    const el=document.getElementById('wc');
+    if(!words.length){ el.innerHTML='<p class="muted">Sem respostas ainda.</p>'; return; }
+    const ns=words.map(w=>w.n); const max=Math.max(...ns), min=Math.min(...ns);
+    const pal=['#12356b','#16879b','#1f8a5b','#e0a100','#8a3ea0','#c0392b','#0d7a8a'];
+    el.innerHTML=words.map((w,i)=>{
+      const t=(max===min)?1:(w.n-min)/(max-min);
+      const size=Math.round(15+t*33);
+      const color=pal[i%pal.length];
+      return '<span style="font-size:'+size+'px;color:'+color+'" title="'+w.n+(w.n>1?' menções':' menção')+'">'+esc(w.word)+'</span>';
+    }).join('');
+  }
 
   // ----- Comunicação (reenvio / mensagem) -----
   function setComm(msg, warn){ const el=document.getElementById('commResult'); el.textContent=msg||''; el.style.display=msg?'block':'none'; el.className='cResult'+(warn?' warn':''); }
