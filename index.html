@@ -342,7 +342,7 @@
   const btn = document.getElementById('btnSubmit');
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    msg.className='msg'; msg.style.display='none';
+    msg.className='msg';
     const data = Object.fromEntries(new FormData(form).entries());
     btn.disabled = true; btn.textContent = 'Enviando…';
     try{
@@ -352,7 +352,7 @@
       const j = await r.json();
       if(j.status === 'ok'){
         msg.className='msg ok';
-        msg.innerHTML = '✔ <strong>Pré-inscrição realizada com sucesso!</strong><br>Aguarde a confirmação no e-mail nos próximos dias.';
+        msg.innerHTML = '✔ <strong>Sua pré-inscrição foi enviada com sucesso!</strong><br>Aguarde a confirmação no e-mail nos próximos dias.';
         form.reset();
       } else {
         msg.className='msg err';
