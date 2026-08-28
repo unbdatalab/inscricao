@@ -65,7 +65,17 @@
   .abtn.ok{background:#1f8a5b;color:#fff}
   .abtn.no{background:#f3f5f9;color:#8a3030;border:1px solid #e6c6c6}
   .abtn:disabled{opacity:.5;cursor:default}
-  @media(max-width:880px){.kpis{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}}
+  /* comunicação */
+  .msgcols{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .msgcols h4{margin:0 0 4px;color:var(--navy);font-size:14.5px}
+  .flbl{display:block;font-size:12.5px;font-weight:600;color:var(--navy);margin:10px 0 4px}
+  .comm input,.comm select,.comm textarea{width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #cdd6e6;border-radius:9px;font-size:14px;font-family:inherit;background:#fff;color:var(--ink)}
+  .comm textarea{resize:vertical;min-height:96px}
+  .comm .btn{background:var(--navy);color:#fff}
+  .comm .btn.sec{background:#eef3fb;color:var(--navy);border:1px solid #d3e0f5}
+  .cResult{display:none;margin-top:14px;padding:11px 14px;border-radius:9px;font-size:13.5px;background:#e6f6ee;border:1px solid #b7e4cd;color:#146c47}
+  .cResult.warn{background:#fff4e5;border-color:#f2d9a8;color:#8a5a00}
+  @media(max-width:880px){.kpis{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}.msgcols{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -73,6 +83,7 @@
   <div class="wrap">
     <div><h1>Painel de Inscrições</h1><div class="sub">Curso 1 · IA na Gestão Universitária — FTrails / DataLab / UnB</div></div>
     <div id="hdrActions" style="display:none">
+      <button class="btn btn-l" id="btnExport">Baixar Excel</button>
       <button class="btn btn-l" id="btnRefresh">Atualizar</button>
       <button class="btn btn-l" id="btnSair">Sair</button>
     </div>
@@ -122,6 +133,33 @@
         <p class="cap">Unidades da federação declaradas na inscrição.</p>
         <div id="ufList"><p class="muted">Sem dados ainda.</p></div>
       </div>
+    </div>
+
+    <div class="card comm" style="margin-top:22px">
+      <h3>Comunicação com inscritos</h3>
+      <p class="cap">Reenvie o e-mail de confirmação ou envie um comunicado. O envio depende do SMTP configurado na Vercel.</p>
+      <div class="msgcols">
+        <div>
+          <h4>Reenviar confirmação</h4>
+          <p class="cap">Redispara o e-mail padrão de confirmação para todos os inscritos <strong>confirmados</strong>.</p>
+          <button class="btn sec" id="btnResend">Reenviar confirmação aos confirmados</button>
+        </div>
+        <div>
+          <h4>Enviar mensagem</h4>
+          <label class="flbl">Público</label>
+          <select id="msgAud">
+            <option value="todos">Todos (pendentes + confirmados)</option>
+            <option value="confirmados">Somente confirmados</option>
+            <option value="pendentes">Somente pendentes</option>
+          </select>
+          <label class="flbl">Assunto</label>
+          <input id="msgSubj" placeholder="Assunto do e-mail">
+          <label class="flbl">Mensagem</label>
+          <textarea id="msgBody" placeholder="Escreva o comunicado. Ele será enviado com uma saudação personalizada (Olá, Nome)."></textarea>
+          <div style="margin-top:12px"><button class="btn" id="btnSend">Enviar mensagem</button></div>
+        </div>
+      </div>
+      <div class="cResult" id="commResult"></div>
     </div>
 
     <div class="cols" style="margin-top:22px">
@@ -247,6 +285,53 @@
   document.getElementById('pw').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('btnEntrar').click(); });
   document.getElementById('btnRefresh').addEventListener('click', load);
   document.getElementById('btnSair').addEventListener('click', ()=>logout(''));
+
+  // ----- Download Excel (gerado no servidor) -----
+  async function exportExcel(){
+    const btn=document.getElementById('btnExport'); const old=btn.textContent;
+    btn.disabled=true; btn.textContent='Gerando…';
+    try{
+      const r=await fetch('/api/export', { headers:{'x-admin-password':PW} });
+      if(r.status===401){ logout('Senha incorreta.'); return; }
+      if(!r.ok) throw new Error('falha');
+      const blob=await r.blob();
+      const cd=r.headers.get('Content-Disposition')||'';
+      const m=/filename="?([^"]+)"?/.exec(cd);
+      const name=(m&&m[1]) || 'inscritos_ftrails_gestao.xlsx';
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click();
+      a.remove(); setTimeout(()=>URL.revokeObjectURL(url), 4000);
+    }catch(e){ alert('Não foi possível gerar o Excel. Tente novamente.'); }
+    finally{ btn.disabled=false; btn.textContent=old; }
+  }
+  document.getElementById('btnExport').addEventListener('click', exportExcel);
+
+  // ----- Comunicação (reenvio / mensagem) -----
+  function setComm(msg, warn){ const el=document.getElementById('commResult'); el.textContent=msg||''; el.style.display=msg?'block':'none'; el.className='cResult'+(warn?' warn':''); }
+  async function postComm(payload, btn){
+    const old=btn.textContent; btn.disabled=true; btn.textContent='Enviando…'; setComm('', false);
+    try{
+      const r=await fetch('/api/broadcast',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':PW},body:JSON.stringify(payload)});
+      if(r.status===401){ logout('Senha incorreta.'); return; }
+      const j=await r.json();
+      if(j.status==='no_smtp'){ setComm(j.message||'SMTP não configurado.', true); }
+      else if(j.status==='ok'){ setComm('Enviados: '+j.sent+' de '+j.total+(j.failed?(' · falhas: '+j.failed):'')+'.', j.failed>0); }
+      else { setComm('Não foi possível enviar: '+(j.error||'erro')+'.', true); }
+    }catch(e){ setComm('Falha de conexão. Tente novamente.', true); }
+    finally{ btn.disabled=false; btn.textContent=old; }
+  }
+  document.getElementById('btnResend').addEventListener('click', ()=>{
+    if(!confirm('Reenviar o e-mail de confirmação para todos os inscritos confirmados?')) return;
+    postComm({mode:'confirmacao', audience:'confirmados'}, document.getElementById('btnResend'));
+  });
+  document.getElementById('btnSend').addEventListener('click', ()=>{
+    const subject=document.getElementById('msgSubj').value.trim();
+    const message=document.getElementById('msgBody').value.trim();
+    const audience=document.getElementById('msgAud').value;
+    if(subject.length<2 || message.length<2){ setComm('Preencha o assunto e a mensagem.', true); return; }
+    if(!confirm('Enviar esta mensagem para o público selecionado?')) return;
+    postComm({mode:'custom', audience, subject, message}, document.getElementById('btnSend'));
+  });
 
   async function doAction(id, action, btn){
     if(action==='cancelar' && !confirm('Cancelar esta inscrição? A vaga será liberada.')) return;

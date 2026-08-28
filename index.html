@@ -79,6 +79,7 @@
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   .fld{display:flex;flex-direction:column;gap:6px;min-width:0}
   .fld.full{grid-column:1 / -1}
+  .subhead{grid-column:1 / -1;font-weight:700;color:var(--navy);font-size:14px;margin:8px 0 -2px;border-top:1px solid var(--line);padding-top:16px}
   label{font-size:13.5px;font-weight:600;color:var(--ink)}
   label .req{color:#c0392b}
   input,select{width:100%;min-width:0;max-width:100%;padding:11px 13px;border:1px solid #cdd6e6;border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--ink)}
@@ -244,10 +245,19 @@
       <form id="formInscricao" novalidate>
         <div class="form-grid">
           <div class="fld full"><label>Nome completo <span class="req">*</span></label><input name="nome" required autocomplete="name"></div>
-          <div class="fld"><label>CPF <span class="req">*</span></label><input name="cpf" inputmode="numeric" placeholder="000.000.000-00" required><span class="hint">Usado apenas para o cadastro no SIGAA.</span></div>
+          <div class="fld"><label>CPF <span class="req">*</span></label><input name="cpf" inputmode="numeric" placeholder="000.000.000-00" required><span class="hint">Usado para o cadastro no SIGAA.</span></div>
+          <div class="fld"><label>Data de nascimento <span class="req">*</span></label><input name="data_nascimento" type="date" required></div>
           <div class="fld"><label>E-mail institucional <span class="req">*</span></label><input name="email" type="email" placeholder="voce@instituicao.br" required><span class="hint">Domínio .br. UnB: @unb.br. Não são aceitos Gmail/Outlook.</span></div>
-          <div class="fld"><label>Telefone</label><input name="telefone" inputmode="tel" placeholder="(61) 99999-9999"></div>
-          <div class="fld"><label>Instituição <span class="req">*</span></label><input name="instituicao" placeholder="Ex.: Universidade de Brasília" required></div>
+          <div class="fld"><label>Telefone / Celular <span class="req">*</span></label><input name="telefone" inputmode="tel" placeholder="(61) 99999-9999" required></div>
+          <div class="fld"><label>Deseja usar nome social? <span class="req">*</span></label>
+            <select name="usa_nome_social" id="usaNomeSocial">
+              <option value="nao">Não</option>
+              <option value="sim">Sim</option>
+            </select>
+            <span class="hint">Nome pelo qual você prefere ser identificado(a).</span>
+          </div>
+          <div class="fld" id="nomeSocialWrap" style="display:none"><label>Nome social <span class="req">*</span></label><input name="nome_social" placeholder="Como deseja ser identificado(a)"></div>
+          <div class="fld full"><label>Instituição <span class="req">*</span></label><input name="instituicao" placeholder="Ex.: Universidade de Brasília" required></div>
           <div class="fld"><label>Vínculo <span class="req">*</span></label>
             <select name="vinculo" required>
               <option value="">Selecione…</option>
@@ -259,13 +269,19 @@
             </select>
           </div>
           <div class="fld"><label>Cargo / função</label><input name="cargo" placeholder="Ex.: Coordenador(a) administrativo(a)"></div>
+          <div class="subhead">Endereço</div>
+          <div class="fld"><label>CEP <span class="req">*</span></label><input name="cep" inputmode="numeric" placeholder="00000-000" required></div>
+          <div class="fld"><label>Número <span class="req">*</span></label><input name="numero" placeholder="Ex.: 123" required></div>
+          <div class="fld full"><label>Rua / Avenida <span class="req">*</span></label><input name="logradouro" placeholder="Ex.: Av. L3 Norte / SQN 000" required></div>
+          <div class="fld"><label>Bairro <span class="req">*</span></label><input name="bairro" placeholder="Ex.: Asa Norte" required></div>
+          <div class="fld"><label>Complemento</label><input name="complemento" placeholder="Apto, bloco, sala (opcional)"></div>
           <div class="fld"><label>UF <span class="req">*</span></label>
             <select name="uf" required>
               <option value="">UF…</option>
               <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option>
             </select>
           </div>
-          <div class="fld"><label>Município</label><input name="municipio" placeholder="Ex.: Brasília"></div>
+          <div class="fld"><label>Município <span class="req">*</span></label><input name="municipio" placeholder="Ex.: Brasília" required></div>
         </div>
         <div class="submit-row">
           <button type="submit" class="btn btn-primary" id="btnSubmit">Enviar pré-inscrição</button>
@@ -309,6 +325,16 @@
     }
     if(txt){ note.innerHTML = txt; note.style.display='block'; } else { note.style.display='none'; }
   }).catch(()=>{});
+
+  // Nome social condicional
+  const usaNS = document.getElementById('usaNomeSocial');
+  const nsWrap = document.getElementById('nomeSocialWrap');
+  const nsInput = nsWrap.querySelector('input');
+  usaNS.addEventListener('change', ()=>{
+    const on = usaNS.value === 'sim';
+    nsWrap.style.display = on ? '' : 'none';
+    if(on){ nsInput.setAttribute('required','required'); } else { nsInput.removeAttribute('required'); nsInput.value=''; }
+  });
 
   // Envio do formulário
   const form = document.getElementById('formInscricao');

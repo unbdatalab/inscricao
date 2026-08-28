@@ -5,6 +5,7 @@
   "description": "Sistema de inscrição da Trilha FTrails de Aprendizagem em IA — DataLab/FT/UnB",
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
-    "nodemailer": "^6.9.15"
+    "nodemailer": "^6.9.15",
+    "xlsx": "^0.18.5"
   }
 }
