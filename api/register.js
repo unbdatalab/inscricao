@@ -29,6 +29,7 @@ module.exports = async (req, res) => {
   const numero = String(body.numero || '').trim();
   const bairro = String(body.bairro || '').trim();
   const complemento = String(body.complemento || '').trim();
+  const desafio = String(body.desafio || '').trim();
 
   // Validações
   if (nome.length < 3) return res.status(400).json({ status: 'error', field: 'nome', message: 'Informe seu nome completo.' });
@@ -36,12 +37,7 @@ module.exports = async (req, res) => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dataNascimento)) return res.status(400).json({ status: 'error', field: 'data_nascimento', message: 'Informe sua data de nascimento.' });
   const chk = checkInstitutionalEmail(email);
   if (!chk.ok) {
-    const msg = chk.reason === 'gratuito'
-      ? 'Use o e-mail institucional da sua universidade/instituição (provedores gratuitos como Gmail e Outlook não são aceitos).'
-      : chk.reason === 'nao_br'
-        ? 'A inscrição exige um e-mail institucional de instituição brasileira (domínio .br).'
-        : 'E-mail inválido.';
-    return res.status(400).json({ status: 'error', field: 'email', message: msg });
+    return res.status(400).json({ status: 'error', field: 'email', message: 'Informe um e-mail válido.' });
   }
   if (telefone.replace(/\D/g, '').length < 10) return res.status(400).json({ status: 'error', field: 'telefone', message: 'Informe um telefone/celular com DDD.' });
   if (usaNomeSocial && nomeSocial.length < 2) return res.status(400).json({ status: 'error', field: 'nome_social', message: 'Informe o nome social.' });
@@ -53,6 +49,7 @@ module.exports = async (req, res) => {
   if (bairro.length < 2) return res.status(400).json({ status: 'error', field: 'bairro', message: 'Informe o bairro.' });
   if (!UFS.includes(uf)) return res.status(400).json({ status: 'error', field: 'uf', message: 'Selecione a UF.' });
   if (municipio.length < 2) return res.status(400).json({ status: 'error', field: 'municipio', message: 'Informe o município.' });
+  if (desafio.length < 5) return res.status(400).json({ status: 'error', field: 'desafio', message: 'Conte, em poucas palavras, seu maior desafio na gestão universitária.' });
 
   // Geolocalização a partir dos headers da Vercel
   const ip_country = req.headers['x-vercel-ip-country'] || null;
@@ -69,7 +66,8 @@ module.exports = async (req, res) => {
     p_instituicao: instituicao, p_vinculo: vinculo, p_cargo: cargo, p_uf: uf, p_municipio: municipio,
     p_ip_region: ip_region, p_ip_country: ip_country, p_ip_city: ip_city,
     p_data_nascimento: dataNascimento, p_usa_nome_social: usaNomeSocial, p_nome_social: nomeSocial,
-    p_cep: cep, p_logradouro: logradouro, p_numero: numero, p_bairro: bairro, p_complemento: complemento
+    p_cep: cep, p_logradouro: logradouro, p_numero: numero, p_bairro: bairro, p_complemento: complemento,
+    p_desafio: desafio
   });
 
   if (error) {
