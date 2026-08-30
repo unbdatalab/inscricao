@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
   const unbOcup = (data.unb_confirmados || 0) + (data.unb_pendentes || 0);
   const extOcup = (data.externo_confirmados || 0) + (data.externo_pendentes || 0);
   return res.status(200).json({
-    unb: { limite: 80, ocupadas: unbOcup, restantes: Math.max(0, 80 - unbOcup) },
-    externo: { limite: 20, ocupadas: extOcup, restantes: Math.max(0, 20 - extOcup) }
+    unb: { limite: 60, ocupadas: unbOcup, restantes: Math.max(0, 60 - unbOcup) },
+    externo: { limite: 40, ocupadas: extOcup, restantes: Math.max(0, 40 - extOcup) }
   });
 };
