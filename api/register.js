@@ -30,10 +30,16 @@ module.exports = async (req, res) => {
   const bairro = String(body.bairro || '').trim();
   const complemento = String(body.complemento || '').trim();
   const desafio = String(body.desafio || '').trim();
+  const estrangeiro = body.estrangeiro === true || body.estrangeiro === 'sim' || body.estrangeiro === 'true' || body.estrangeiro === 'on';
+  const passaporte = String(body.passaporte || '').trim();
 
   // Validações
   if (nome.length < 3) return res.status(400).json({ status: 'error', field: 'nome', message: 'Informe seu nome completo.' });
-  if (!isValidCPF(cpf)) return res.status(400).json({ status: 'error', field: 'cpf', message: 'CPF inválido.' });
+  if (estrangeiro) {
+    if (passaporte.length < 4) return res.status(400).json({ status: 'error', field: 'passaporte', message: 'Informe o número do passaporte.' });
+  } else {
+    if (!isValidCPF(cpf)) return res.status(400).json({ status: 'error', field: 'cpf', message: 'CPF inválido.' });
+  }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dataNascimento)) return res.status(400).json({ status: 'error', field: 'data_nascimento', message: 'Informe sua data de nascimento.' });
   const chk = checkInstitutionalEmail(email);
   if (!chk.ok) {
@@ -67,7 +73,7 @@ module.exports = async (req, res) => {
     p_ip_region: ip_region, p_ip_country: ip_country, p_ip_city: ip_city,
     p_data_nascimento: dataNascimento, p_usa_nome_social: usaNomeSocial, p_nome_social: nomeSocial,
     p_cep: cep, p_logradouro: logradouro, p_numero: numero, p_bairro: bairro, p_complemento: complemento,
-    p_desafio: desafio
+    p_desafio: desafio, p_estrangeiro: estrangeiro, p_passaporte: passaporte
   });
 
   if (error) {

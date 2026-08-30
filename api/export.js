@@ -35,7 +35,8 @@ module.exports = async (req, res) => {
   catch (e) { return res.status(500).json({ error: e.message }); }
 
   const cols = 'created_at,status,categoria,nome,nome_social,usa_nome_social,cpf,data_nascimento,email,telefone,' +
-               'instituicao,vinculo,cargo,cep,logradouro,numero,bairro,complemento,uf,municipio,ip_region,ip_city,desafio';
+               'instituicao,vinculo,cargo,cep,logradouro,numero,bairro,complemento,uf,municipio,ip_region,ip_city,desafio,' +
+               'estrangeiro,passaporte';
   const { data, error } = await supabase
     .from('ftrails_registrations')
     .select(cols)
@@ -49,7 +50,7 @@ module.exports = async (req, res) => {
   const head = ['Data/hora', 'Status', 'Categoria', 'Nome completo', 'Nome social', 'Usa nome social', 'CPF',
     'Data de nascimento', 'E-mail', 'Telefone/Celular', 'Instituição', 'Vínculo', 'Cargo', 'CEP', 'Rua/Avenida',
     'Número', 'Bairro', 'Complemento', 'UF', 'Município', 'Região (IP)', 'Cidade (IP)',
-    'Maior desafio na gestão universitária'];
+    'Maior desafio na gestão universitária', 'Estrangeiro', 'Passaporte'];
   const body = rows.map(x => [
     fmtDateTime(x.created_at),
     x.status === 'confirmed' ? 'Confirmado' : (x.status === 'pending' ? 'Pendente' : (x.status || '')),
@@ -58,11 +59,12 @@ module.exports = async (req, res) => {
     fmtDateBR(x.data_nascimento), x.email || '', x.telefone || '', x.instituicao || '',
     VINCULO_LABEL[x.vinculo] || x.vinculo || '', x.cargo || '', x.cep || '', x.logradouro || '',
     x.numero || '', x.bairro || '', x.complemento || '', x.uf || '', x.municipio || '', x.ip_region || '', x.ip_city || '',
-    x.desafio || '',
+    x.desafio || '', x.estrangeiro ? 'Sim' : 'Não', x.passaporte || '',
   ]);
 
+  const DESAFIO_COL = head.indexOf('Maior desafio na gestão universitária');
   const ws = XLSX.utils.aoa_to_sheet([head, ...body]);
-  ws['!cols'] = head.map((h, i) => ({ wch: (i === head.length - 1) ? 60 : ((i === 8 || i === 10) ? 30 : (i === 3 ? 26 : (i === 14 ? 24 : 15))) }));
+  ws['!cols'] = head.map((h, i) => ({ wch: (i === DESAFIO_COL) ? 60 : ((i === 8 || i === 10) ? 30 : (i === 3 ? 26 : (i === 14 ? 24 : 15))) }));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Inscritos');
   const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
