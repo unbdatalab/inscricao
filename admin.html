@@ -218,8 +218,8 @@
       kpi('Total','' + (d.total||0), (d.confirmados||0)+' confirmados · '+(d.pendentes||0)+' pendentes') +
       kpi('Confirmados','' + (d.confirmados||0), 'vaga garantida') +
       kpi('Pendentes','' + (d.pendentes||0), 'aguardando confirmação') +
-      kpi('Vagas UnB', unbOc+'/80', (80-unbOc)+' restantes', unbOc/80, '#12356b') +
-      kpi('Vagas externas', extOc+'/20', (20-extOc)+' restantes', extOc/20, '#e0a100');
+      kpi('Vagas UnB', unbOc+'/60', (60-unbOc)+' restantes', unbOc/60, '#12356b') +
+      kpi('Vagas externas', extOc+'/40', (40-extOc)+' restantes', extOc/40, '#e0a100');
 
     // Mapa por região
     const reg = d.por_regiao || {};
