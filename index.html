@@ -80,6 +80,9 @@
   .fld{display:flex;flex-direction:column;gap:6px;min-width:0}
   .fld.full{grid-column:1 / -1}
   .subhead{grid-column:1 / -1;font-weight:700;color:var(--navy);font-size:14px;margin:8px 0 -2px;border-top:1px solid var(--line);padding-top:16px}
+  .chk-row{grid-column:1 / -1;display:flex;align-items:center;gap:10px;background:#f3f7ff;border:1px solid #d8e4f7;border-radius:10px;padding:11px 13px}
+  .chk-row input{width:18px;height:18px;min-width:0;margin:0;cursor:pointer}
+  .chk-row label{margin:0;cursor:pointer;font-weight:600;color:var(--ink)}
   label{font-size:13.5px;font-weight:600;color:var(--ink)}
   label .req{color:#c0392b}
   input,select,textarea{width:100%;min-width:0;max-width:100%;padding:11px 13px;border:1px solid #cdd6e6;border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--ink)}
@@ -246,7 +249,12 @@
       <form id="formInscricao" novalidate>
         <div class="form-grid">
           <div class="fld full"><label>Nome completo <span class="req">*</span></label><input name="nome" required autocomplete="name"></div>
-          <div class="fld"><label>CPF <span class="req">*</span></label><input name="cpf" inputmode="numeric" placeholder="000.000.000-00" required><span class="hint">Usado para o cadastro no SIGAA.</span></div>
+          <div class="chk-row">
+            <input type="checkbox" id="estrangeiro" name="estrangeiro" value="sim">
+            <label for="estrangeiro">Sou estrangeiro(a) — não tenho CPF</label>
+          </div>
+          <div class="fld" id="cpfWrap"><label>CPF <span class="req">*</span></label><input name="cpf" inputmode="numeric" placeholder="000.000.000-00" required><span class="hint">Usado para o cadastro no SIGAA.</span></div>
+          <div class="fld" id="passaporteWrap" style="display:none"><label>Passaporte <span class="req">*</span></label><input name="passaporte" placeholder="Número do passaporte"><span class="hint">Para participantes estrangeiros, em vez do CPF.</span></div>
           <div class="fld"><label>Data de nascimento <span class="req">*</span></label><input name="data_nascimento" type="date" required></div>
           <div class="fld"><label>E-mail <span class="req">*</span></label><input name="email" type="email" placeholder="voce@email.com" required><span class="hint">Comunidade UnB: use <strong>@unb.br</strong> (vaga interna). Demais participantes: qualquer e-mail (vaga externa).</span></div>
           <div class="fld"><label>Telefone / Celular <span class="req">*</span></label><input name="telefone" inputmode="tel" placeholder="(61) 99999-9999" required></div>
@@ -344,6 +352,20 @@
     }
     if(txt){ note.innerHTML = txt; note.style.display='block'; } else { note.style.display='none'; }
   }).catch(()=>{});
+
+  // Estrangeiro: troca CPF por Passaporte
+  const estr = document.getElementById('estrangeiro');
+  const cpfWrap = document.getElementById('cpfWrap');
+  const cpfInput = cpfWrap.querySelector('input');
+  const passWrap = document.getElementById('passaporteWrap');
+  const passInput = passWrap.querySelector('input');
+  estr.addEventListener('change', () => {
+    const on = estr.checked;
+    cpfWrap.style.display = on ? 'none' : '';
+    passWrap.style.display = on ? '' : 'none';
+    if(on){ cpfInput.removeAttribute('required'); cpfInput.value=''; passInput.setAttribute('required','required'); }
+    else { passInput.removeAttribute('required'); passInput.value=''; cpfInput.setAttribute('required','required'); }
+  });
 
   // Nome social condicional
   const usaNS = document.getElementById('usaNomeSocial');
