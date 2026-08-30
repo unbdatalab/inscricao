@@ -305,6 +305,22 @@
 </footer>
 
 <script>
+  // Rolagem até a seção correta ao clicar nos botões do topo (âncoras internas).
+  // Garante o comportamento mesmo em navegadores/situações em que a âncora nativa falha.
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener('click', function(e){
+      var id = a.getAttribute('href').slice(1);
+      var el = id && document.getElementById(id);
+      if(el){
+        e.preventDefault();
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        try { history.replaceState(null, '', '#'+id); } catch(_){}
+        var foco = el.querySelector('input, select, textarea');
+        if(foco){ setTimeout(function(){ try{ foco.focus({preventScroll:true}); }catch(_){ } }, 650); }
+      }
+    });
+  });
+
   // Máscara simples de CPF
   const cpf = document.querySelector('input[name=cpf]');
   cpf.addEventListener('input', () => {
