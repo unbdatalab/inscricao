@@ -73,6 +73,15 @@
   .comm textarea{resize:vertical;min-height:96px}
   .comm .btn{background:var(--navy);color:#fff}
   .comm .btn.sec{background:#eef3fb;color:var(--navy);border:1px solid #d3e0f5}
+  /* controle de encerramento */
+  .ctrl-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .switch{position:relative;display:inline-block;width:54px;height:30px;flex:0 0 auto}
+  .switch input{opacity:0;width:0;height:0}
+  .slider{position:absolute;cursor:pointer;inset:0;background:#c9d3e3;border-radius:999px;transition:.2s}
+  .slider:before{content:"";position:absolute;height:24px;width:24px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+  .switch input:checked + .slider{background:#c0392b}
+  .switch input:checked + .slider:before{transform:translateX(24px)}
+  .card.ctrl.on{border-color:#f0b8b0;background:#fff6f5}
   /* mapa de palavras */
   .wc{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:center;padding:14px 6px;line-height:1.15;min-height:120px}
   .wc span{font-weight:800;white-space:nowrap;transition:opacity .15s}
@@ -104,6 +113,15 @@
 
 <main id="dash">
   <div class="wrap">
+    <div class="card ctrl" id="ctrlCard" style="margin-bottom:22px">
+      <div class="ctrl-row">
+        <div>
+          <h3 style="margin:0 0 3px">Encerrar inscrições</h3>
+          <p class="cap" style="margin:0" id="ctrlHint">Carregando…</p>
+        </div>
+        <label class="switch"><input type="checkbox" id="swEncerrar"><span class="slider"></span></label>
+      </div>
+    </div>
     <div class="kpis" id="kpis"></div>
     <div class="cols">
       <div class="card">
@@ -211,14 +229,25 @@
     return '<div class="kpi"><div class="l">'+l+'</div><div class="v">'+v+'</div><div class="s">'+s+'</div>'+bar+'</div>';
   }
 
+  function updateEncerrado(state){
+    const sw = document.getElementById('swEncerrar');
+    const hint = document.getElementById('ctrlHint');
+    const card = document.getElementById('ctrlCard');
+    if(sw) sw.checked = !!state;
+    if(card) card.classList.toggle('on', !!state);
+    if(hint) hint.textContent = state
+      ? 'Inscrições ENCERRADAS — a página principal mostra "vagas esgotadas". Desative para reabrir.'
+      : 'Inscrições abertas. Ative para encerrar e mostrar "vagas esgotadas" na página principal.';
+  }
   function render(d){
+    updateEncerrado(d.encerrado === true);
     // KPIs
     const unbOc=(d.unb_confirmados||0)+(d.unb_pendentes||0), extOc=(d.externo_confirmados||0)+(d.externo_pendentes||0);
     document.getElementById('kpis').innerHTML =
       kpi('Total','' + (d.total||0), (d.confirmados||0)+' confirmados · '+(d.pendentes||0)+' pendentes') +
       kpi('Confirmados','' + (d.confirmados||0), 'vaga garantida') +
       kpi('Pendentes','' + (d.pendentes||0), 'aguardando confirmação') +
-      kpi('Vagas UnB', unbOc+'/60', (60-unbOc)+' restantes', unbOc/60, '#12356b') +
+      kpi('Vagas UnB', unbOc+'/70', (70-unbOc)+' restantes', unbOc/70, '#12356b') +
       kpi('Vagas externas', extOc+'/40', (40-extOc)+' restantes', extOc/40, '#e0a100');
 
     // Mapa por região
@@ -315,6 +344,24 @@
     finally{ btn.disabled=false; btn.textContent=old; }
   }
   document.getElementById('btnExport').addEventListener('click', exportExcel);
+
+  // ----- Chave: encerrar inscrições -----
+  document.getElementById('swEncerrar').addEventListener('change', async (e)=>{
+    const sw = e.target; const desejado = sw.checked;
+    const aviso = desejado
+      ? 'Encerrar as inscrições? A página principal passará a mostrar "vagas esgotadas" e novas pré-inscrições serão bloqueadas.'
+      : 'Reabrir as inscrições?';
+    if(!confirm(aviso)){ sw.checked = !desejado; return; }
+    sw.disabled = true;
+    try{
+      const r = await fetch('/api/admin-config', {method:'POST', headers:{'Content-Type':'application/json','x-admin-password':PW}, body: JSON.stringify({encerrado: desejado})});
+      if(r.status===401){ logout('Senha incorreta.'); return; }
+      const j = await r.json();
+      if(j.status==='ok'){ updateEncerrado(j.encerrado === true); }
+      else { alert('Não foi possível alterar: '+(j.error||'erro')); sw.checked = !desejado; }
+    }catch(err){ alert('Falha de conexão. Tente novamente.'); sw.checked = !desejado; }
+    finally{ sw.disabled = false; }
+  });
 
   // ----- Mapa de palavras -----
   async function loadWordcloud(){

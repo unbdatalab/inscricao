@@ -29,6 +29,10 @@
   .hero .wrap{position:relative;padding:44px 20px 40px}
   .badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600;letter-spacing:.3px}
   .badge.open{background:rgba(31,138,91,.25);border-color:rgba(120,220,170,.5)}
+  .badge.closed{background:rgba(192,57,43,.30);border-color:rgba(240,170,160,.55)}
+  .encerrado-banner{background:#fdecec;border:1px solid #f4c4c4;border-radius:14px;padding:28px 24px;text-align:center;margin-top:6px}
+  .encerrado-banner h3{margin:0 0 8px;color:#a13030;font-size:23px}
+  .encerrado-banner p{margin:0;color:#7a3030;font-size:15px}
   .hero h1{font-size:34px;line-height:1.18;margin:16px 0 8px;max-width:760px}
   .hero .sub{font-size:18px;opacity:.92;max-width:680px}
   .hero .trilha{margin-top:6px;font-size:14px;opacity:.8}
@@ -146,7 +150,7 @@
 
 <header class="hero">
   <div class="wrap">
-    <span class="badge open">● Matrículas abertas · Curso 1 · Gestão Universitária</span>
+    <span class="badge open" id="badgeStatus">● Matrículas abertas · Curso 1 · Gestão Universitária</span>
     <h1>Introdução à Inteligência Artificial Aplicada à Gestão Universitária</h1>
     <p class="sub">Formação de extensão, gratuita e remota, para usar a IA generativa como ferramenta de trabalho na gestão de instituições de ensino, pesquisa e administração pública.</p>
     <p class="trilha">Percurso inicial · Eixo Gestão · Método DMCA (Domínio, Missão, Casos de uso e Aplicação) — DataLab / Faculdade de Tecnologia / UnB</p>
@@ -162,7 +166,7 @@
     <div class="fact"><div class="lbl">Carga horária</div><div class="val">40 horas<small>20h síncronas + 20h práticas</small></div></div>
     <div class="fact"><div class="lbl">Modalidade</div><div class="val">Remota<small>ao vivo + Aprender3</small></div></div>
     <div class="fact"><div class="lbl">Período</div><div class="val">01 a 15/09/2026<small>4 sessões, terças e sexta</small></div></div>
-    <div class="fact"><div class="lbl">Vagas</div><div class="val">100<small>por curso</small></div></div>
+    <div class="fact"><div class="lbl">Vagas</div><div class="val">110<small>por curso</small></div></div>
   </div>
 </div>
 
@@ -244,7 +248,11 @@
   <div class="wrap">
     <div class="form-card">
       <h2>Pré-inscrição</h2>
-      <p class="lead" style="color:var(--muted)">Preencha os dados abaixo para realizar sua <strong>pré-inscrição</strong>. Sua vaga fica <strong>reservada</strong> e será <strong>confirmada pela coordenação</strong>; você receberá um e-mail de confirmação nos próximos dias.</p>
+      <div class="encerrado-banner" id="encerradoBanner" hidden>
+        <h3>Vagas esgotadas</h3>
+        <p>As inscrições para esta turma estão <strong>encerradas</strong>. Acompanhe as próximas turmas da trilha FTrails.</p>
+      </div>
+      <p class="lead" id="formIntro" style="color:var(--muted)">Preencha os dados abaixo para realizar sua <strong>pré-inscrição</strong>. Sua vaga fica <strong>reservada</strong> e será <strong>confirmada pela coordenação</strong>; você receberá um e-mail de confirmação nos próximos dias.</p>
       <div class="form-note warn" id="vagaNote" style="display:none"></div>
       <form id="formInscricao" novalidate>
         <div class="form-grid">
@@ -337,9 +345,26 @@
     cpf.value = v;
   });
 
-  // Disponibilidade de vagas — usada apenas para o aviso de esgotamento por grupo
+  // Encerramento manual das inscrições (chave do painel admin)
+  function aplicarEncerrado(){
+    const badge = document.getElementById('badgeStatus');
+    const banner = document.getElementById('encerradoBanner');
+    const intro = document.getElementById('formIntro');
+    const form = document.getElementById('formInscricao');
+    const note = document.getElementById('vagaNote');
+    const cta = document.querySelector('.cta-row a[href="#inscricao"]');
+    if(banner) banner.hidden = false;
+    if(intro) intro.style.display = 'none';
+    if(form) form.style.display = 'none';
+    if(note) note.style.display = 'none';
+    if(badge){ badge.textContent = '● Inscrições encerradas · Curso 1 · Gestão Universitária'; badge.classList.remove('open'); badge.classList.add('closed'); }
+    if(cta){ cta.textContent = 'Vagas esgotadas'; }
+  }
+
+  // Disponibilidade de vagas + estado de encerramento
   fetch('/api/vagas').then(r=>r.json()).then(v=>{
     if(!v || v.error) return;
+    if(v.encerrado){ aplicarEncerrado(); return; }
     const note = document.getElementById('vagaNote');
     if(!note) return;
     let txt = '';
@@ -395,6 +420,8 @@
         msg.className='msg ok';
         msg.innerHTML = '✔ <strong>Sua pré-inscrição foi enviada com sucesso!</strong><br>Aguarde a confirmação no e-mail nos próximos dias.';
         form.reset();
+      } else if(j.status === 'closed'){
+        aplicarEncerrado();
       } else {
         msg.className='msg err';
         msg.textContent = '⚠ '+(j.message || 'Não foi possível concluir a pré-inscrição.');
