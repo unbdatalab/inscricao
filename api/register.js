@@ -81,6 +81,9 @@ module.exports = async (req, res) => {
     return res.status(500).json({ status: 'error', message: 'Erro ao processar a inscrição. Tente novamente em instantes.' });
   }
 
+  if (data.status === 'closed') {
+    return res.status(409).json({ status: 'closed', message: 'As inscrições estão encerradas.' });
+  }
   if (data.status === 'duplicate') {
     return res.status(409).json({ status: 'duplicate', message: 'Este e-mail já possui uma inscrição neste curso.' });
   }
