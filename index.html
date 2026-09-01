@@ -345,38 +345,53 @@
     cpf.value = v;
   });
 
-  // Encerramento manual das inscrições (chave do painel admin)
-  function aplicarEncerrado(){
+  // Reflete o estado (aberto/encerrado) na página — reversível, sem precisar recarregar.
+  function atualizarEstado(v){
     const badge = document.getElementById('badgeStatus');
     const banner = document.getElementById('encerradoBanner');
     const intro = document.getElementById('formIntro');
     const form = document.getElementById('formInscricao');
     const note = document.getElementById('vagaNote');
     const cta = document.querySelector('.cta-row a[href="#inscricao"]');
-    if(banner) banner.hidden = false;
-    if(intro) intro.style.display = 'none';
-    if(form) form.style.display = 'none';
-    if(note) note.style.display = 'none';
-    if(badge){ badge.textContent = '● Inscrições encerradas · Curso 1 · Gestão Universitária'; badge.classList.remove('open'); badge.classList.add('closed'); }
-    if(cta){ cta.textContent = 'Vagas esgotadas'; }
+
+    if(v && v.encerrado){
+      if(banner) banner.hidden = false;
+      if(intro) intro.style.display = 'none';
+      if(form) form.style.display = 'none';
+      if(note) note.style.display = 'none';
+      if(badge){ badge.textContent = '● Inscrições encerradas · Curso 1 · Gestão Universitária'; badge.classList.remove('open'); badge.classList.add('closed'); }
+      if(cta){ cta.textContent = 'Vagas esgotadas'; }
+      return;
+    }
+
+    // Inscrições abertas — restaura tudo
+    if(banner) banner.hidden = true;
+    if(intro) intro.style.display = '';
+    if(form) form.style.display = '';
+    if(badge){ badge.textContent = '● Matrículas abertas · Curso 1 · Gestão Universitária'; badge.classList.remove('closed'); badge.classList.add('open'); }
+    if(cta){ cta.textContent = 'Fazer minha pré-inscrição'; }
+
+    // Aviso de esgotamento por grupo (só quando um grupo zera)
+    if(note && v && v.unb && v.externo){
+      let txt = '';
+      if(v.unb.restantes<=0 && v.externo.restantes<=0){
+        txt = '⚠ As vagas deste curso estão <strong>esgotadas</strong>. Acompanhe as próximas turmas da trilha FTrails.';
+      } else if(v.unb.restantes<=0){
+        txt = '⚠ As vagas <strong>internas (@unb.br)</strong> estão esgotadas. Ainda há vagas para participantes de <strong>outras instituições brasileiras</strong>.';
+      } else if(v.externo.restantes<=0){
+        txt = '⚠ As vagas <strong>externas (outras instituições)</strong> estão esgotadas. Ainda há vagas para a <strong>comunidade UnB (@unb.br)</strong>.';
+      }
+      if(txt){ note.innerHTML = txt; note.style.display='block'; } else { note.style.display='none'; }
+    }
   }
 
-  // Disponibilidade de vagas + estado de encerramento
-  fetch('/api/vagas').then(r=>r.json()).then(v=>{
-    if(!v || v.error) return;
-    if(v.encerrado){ aplicarEncerrado(); return; }
-    const note = document.getElementById('vagaNote');
-    if(!note) return;
-    let txt = '';
-    if(v.unb.restantes<=0 && v.externo.restantes<=0){
-      txt = '⚠ As vagas deste curso estão <strong>esgotadas</strong>. Acompanhe as próximas turmas da trilha FTrails.';
-    } else if(v.unb.restantes<=0){
-      txt = '⚠ As vagas <strong>internas (@unb.br)</strong> estão esgotadas. Ainda há vagas para participantes de <strong>outras instituições brasileiras</strong>.';
-    } else if(v.externo.restantes<=0){
-      txt = '⚠ As vagas <strong>externas (outras instituições)</strong> estão esgotadas. Ainda há vagas para a <strong>comunidade UnB (@unb.br)</strong>.';
-    }
-    if(txt){ note.innerHTML = txt; note.style.display='block'; } else { note.style.display='none'; }
-  }).catch(()=>{});
+  // Verifica o estado ao carregar, periodicamente e ao voltar o foco à aba.
+  function checarVagas(){
+    fetch('/api/vagas?_t='+Date.now()).then(r=>r.json()).then(v=>{ if(v && !v.error) atualizarEstado(v); }).catch(()=>{});
+  }
+  checarVagas();
+  setInterval(checarVagas, 30000);
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) checarVagas(); });
 
   // Estrangeiro: troca CPF por Passaporte
   const estr = document.getElementById('estrangeiro');
@@ -421,7 +436,9 @@
         msg.innerHTML = '✔ <strong>Sua pré-inscrição foi enviada com sucesso!</strong><br>Aguarde a confirmação no e-mail nos próximos dias.';
         form.reset();
       } else if(j.status === 'closed'){
-        aplicarEncerrado();
+        atualizarEstado({encerrado:true});
+        msg.className='msg err';
+        msg.textContent = '⚠ As inscrições foram encerradas.';
       } else {
         msg.className='msg err';
         msg.textContent = '⚠ '+(j.message || 'Não foi possível concluir a pré-inscrição.');
