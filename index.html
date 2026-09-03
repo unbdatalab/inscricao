@@ -166,7 +166,7 @@
     <div class="fact"><div class="lbl">Carga horária</div><div class="val">40 horas<small>20h síncronas + 20h práticas</small></div></div>
     <div class="fact"><div class="lbl">Modalidade</div><div class="val">Remota<small>ao vivo + Aprender3</small></div></div>
     <div class="fact"><div class="lbl">Período</div><div class="val">01 a 15/09/2026<small>4 sessões, terças e sexta</small></div></div>
-    <div class="fact"><div class="lbl">Vagas</div><div class="val">110<small>por curso</small></div></div>
+    <div class="fact"><div class="lbl">Vagas</div><div class="val"><span id="vagasTotal">115</span><small>por curso</small></div></div>
   </div>
 </div>
 
@@ -347,6 +347,12 @@
 
   // Reflete o estado (aberto/encerrado) na página — reversível, sem precisar recarregar.
   function atualizarEstado(v){
+    // Total de vagas (soma dos limites atuais)
+    if(v && v.unb && v.externo){
+      const tot = (Number(v.unb.limite)||0) + (Number(v.externo.limite)||0);
+      const el = document.getElementById('vagasTotal');
+      if(el && tot>0) el.textContent = tot;
+    }
     const badge = document.getElementById('badgeStatus');
     const banner = document.getElementById('encerradoBanner');
     const intro = document.getElementById('formIntro');

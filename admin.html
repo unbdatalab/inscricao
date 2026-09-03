@@ -82,6 +82,18 @@
   .switch input:checked + .slider{background:#c0392b}
   .switch input:checked + .slider:before{transform:translateX(24px)}
   .card.ctrl.on{border-color:#f0b8b0;background:#fff6f5}
+  /* contador de vagas */
+  .vg-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .vg-item{background:#f6f9ff;border:1px solid #e3e9f4;border-radius:12px;padding:14px 16px}
+  .vg-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px}
+  .vg-name{font-weight:700;color:var(--navy);font-size:14px}
+  .vg-occ{font-size:12.5px;color:var(--muted)}
+  .stepper{display:flex;align-items:center;gap:14px;justify-content:center}
+  .stepper .stp{width:40px;height:40px;border:none;border-radius:10px;background:#12356b;color:#fff;font-size:22px;font-weight:800;line-height:1;cursor:pointer}
+  .stepper .stp:hover{background:#0d2650}
+  .stepper .stp:disabled{opacity:.45;cursor:default}
+  .stepper .stp-val{min-width:56px;text-align:center;font-size:28px;font-weight:800;color:var(--navy)}
+  @media(max-width:560px){.vg-grid{grid-template-columns:1fr}}
   /* mapa de palavras */
   .wc{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:center;padding:14px 6px;line-height:1.15;min-height:120px}
   .wc span{font-weight:800;white-space:nowrap;transition:opacity .15s}
@@ -123,6 +135,21 @@
       </div>
     </div>
     <div class="kpis" id="kpis"></div>
+    <div class="card" id="vagasCtrl" style="margin-bottom:22px">
+      <h3>Vagas por categoria</h3>
+      <p class="cap">Use os botões para aumentar ou diminuir as vagas. A mudança vale na hora para novas pré-inscrições.</p>
+      <div class="vg-grid">
+        <div class="vg-item">
+          <div class="vg-top"><span class="vg-name">Vagas UnB (@unb.br)</span><span class="vg-occ" id="occ-unb">—</span></div>
+          <div class="stepper"><button type="button" class="stp" data-cat="unb" data-d="-1">−</button><span class="stp-val" id="lim-unb">—</span><button type="button" class="stp" data-cat="unb" data-d="1">+</button></div>
+        </div>
+        <div class="vg-item">
+          <div class="vg-top"><span class="vg-name">Vagas externas</span><span class="vg-occ" id="occ-externo">—</span></div>
+          <div class="stepper"><button type="button" class="stp" data-cat="externo" data-d="-1">−</button><span class="stp-val" id="lim-externo">—</span><button type="button" class="stp" data-cat="externo" data-d="1">+</button></div>
+        </div>
+      </div>
+      <div class="cResult" id="vgResult"></div>
+    </div>
     <div class="cols">
       <div class="card">
         <h3>Mapa de inscritos por região</h3>
@@ -209,6 +236,8 @@
 
 <script>
   let PW = sessionStorage.getItem('ftrails_pw') || '';
+  const limitesAtuais = { unb: 0, externo: 0 };
+  const ocupadasAtuais = { unb: 0, externo: 0 };
 
   const REG_COLORS = ['#cfe0f5','#8fb4e6','#4f7fc9','#2b579b','#12356b'];
   function scaleColor(v, max){
@@ -243,12 +272,23 @@
     updateEncerrado(d.encerrado === true);
     // KPIs
     const unbOc=(d.unb_confirmados||0)+(d.unb_pendentes||0), extOc=(d.externo_confirmados||0)+(d.externo_pendentes||0);
+    const limUnb=Number(d.limite_unb)||0, limExt=Number(d.limite_externo)||0;
     document.getElementById('kpis').innerHTML =
       kpi('Total','' + (d.total||0), (d.confirmados||0)+' confirmados · '+(d.pendentes||0)+' pendentes') +
       kpi('Confirmados','' + (d.confirmados||0), 'vaga garantida') +
       kpi('Pendentes','' + (d.pendentes||0), 'aguardando confirmação') +
-      kpi('Vagas UnB', unbOc+'/70', (70-unbOc)+' restantes', unbOc/70, '#12356b') +
-      kpi('Vagas externas', extOc+'/40', (40-extOc)+' restantes', extOc/40, '#e0a100');
+      kpi('Vagas UnB', unbOc+'/'+limUnb, Math.max(0,limUnb-unbOc)+' restantes', limUnb?unbOc/limUnb:0, '#12356b') +
+      kpi('Vagas externas', extOc+'/'+limExt, Math.max(0,limExt-extOc)+' restantes', limExt?extOc/limExt:0, '#e0a100');
+
+    // Contador de vagas (limites editáveis)
+    limitesAtuais.unb = limUnb; limitesAtuais.externo = limExt;
+    ocupadasAtuais.unb = unbOc; ocupadasAtuais.externo = extOc;
+    const su=document.getElementById('lim-unb'), se=document.getElementById('lim-externo');
+    if(su) su.textContent = limUnb;
+    if(se) se.textContent = limExt;
+    const ou=document.getElementById('occ-unb'), oe=document.getElementById('occ-externo');
+    if(ou) ou.textContent = unbOc+' ocupadas';
+    if(oe) oe.textContent = extOc+' ocupadas';
 
     // Mapa por região
     const reg = d.por_regiao || {};
@@ -344,6 +384,36 @@
     finally{ btn.disabled=false; btn.textContent=old; }
   }
   document.getElementById('btnExport').addEventListener('click', exportExcel);
+
+  // ----- Contador de vagas -----
+  function setVg(msg, warn){ const el=document.getElementById('vgResult'); el.textContent=msg||''; el.style.display=msg?'block':'none'; el.className='cResult'+(warn?' warn':''); }
+  async function ajustarVagas(cat, delta){
+    const min = Math.max(0, ocupadasAtuais[cat]||0);
+    const novo = Math.max(min, (limitesAtuais[cat]||0) + delta);
+    if(novo === limitesAtuais[cat]){
+      if(delta < 0) setVg('Não dá para reduzir abaixo das '+min+' vagas já ocupadas nesta categoria.', true);
+      return;
+    }
+    const payload = { limite_unb: cat==='unb'?novo:limitesAtuais.unb, limite_externo: cat==='externo'?novo:limitesAtuais.externo };
+    document.querySelectorAll('.stp').forEach(b=>b.disabled=true);
+    try{
+      const r=await fetch('/api/admin-limits',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':PW},body:JSON.stringify(payload)});
+      if(r.status===401){ logout('Senha incorreta.'); return; }
+      const j=await r.json();
+      if(j.status==='ok'){
+        limitesAtuais.unb=j.limite_unb; limitesAtuais.externo=j.limite_externo;
+        document.getElementById('lim-unb').textContent=j.limite_unb;
+        document.getElementById('lim-externo').textContent=j.limite_externo;
+        setVg('Vagas atualizadas: UnB '+j.limite_unb+' · Externas '+j.limite_externo+'.', false);
+        load();
+      } else { setVg('Não foi possível atualizar: '+(j.error||'erro'), true); }
+    }catch(e){ setVg('Falha de conexão. Tente novamente.', true); }
+    finally{ document.querySelectorAll('.stp').forEach(b=>b.disabled=false); }
+  }
+  document.getElementById('vagasCtrl').addEventListener('click', (e)=>{
+    const b=e.target.closest('.stp'); if(!b) return;
+    ajustarVagas(b.getAttribute('data-cat'), parseInt(b.getAttribute('data-d'),10));
+  });
 
   // ----- Chave: encerrar inscrições -----
   document.getElementById('swEncerrar').addEventListener('change', async (e)=>{
