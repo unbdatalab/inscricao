@@ -12,9 +12,11 @@ module.exports = async (req, res) => {
 
   const unbOcup = (data.unb_confirmados || 0) + (data.unb_pendentes || 0);
   const extOcup = (data.externo_confirmados || 0) + (data.externo_pendentes || 0);
+  const limUnb = Number(data.limite_unb) || 0;
+  const limExt = Number(data.limite_externo) || 0;
   return res.status(200).json({
     encerrado: data.encerrado === true,
-    unb: { limite: 70, ocupadas: unbOcup, restantes: Math.max(0, 70 - unbOcup) },
-    externo: { limite: 40, ocupadas: extOcup, restantes: Math.max(0, 40 - extOcup) }
+    unb: { limite: limUnb, ocupadas: unbOcup, restantes: Math.max(0, limUnb - unbOcup) },
+    externo: { limite: limExt, ocupadas: extOcup, restantes: Math.max(0, limExt - extOcup) }
   });
 };
