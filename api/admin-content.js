@@ -1,6 +1,9 @@
 const { getSupabase } = require('../lib/util');
 
-// Salva o conteúdo editável (datas e painel de pré-inscrição) de um curso. Protegido pela senha.
+// Hub da central de cursos (protegido pela senha do painel):
+//   GET             -> visão geral de todos os cursos (config + conteúdo + ocupação)
+//   POST op=ativo   -> define qual curso fica ABERTO ao público (e o reabre)
+//   POST (conteudo) -> salva datas e conteúdo editável de um curso
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
 
@@ -13,10 +16,29 @@ module.exports = async (req, res) => {
   if (!expected) return res.status(500).json({ error: 'ADMIN_PASSWORD não configurada.' });
   if (String(pw) !== String(expected)) return res.status(401).json({ error: 'nao_autorizado' });
 
+  let supabase;
+  try { supabase = getSupabase(); }
+  catch (e) { return res.status(500).json({ error: e.message }); }
+
+  // GET -> visão geral de todos os cursos
+  if (req.method === 'GET') {
+    const { data, error } = await supabase.rpc('ftrails_admin_overview');
+    if (error) { console.error('overview error', error); return res.status(500).json({ error: 'falha' }); }
+    return res.status(200).json({ cursos: data || [] });
+  }
+
   const curso = String(body.curso || '').trim();
   if (!curso) return res.status(400).json({ error: 'curso_invalido' });
 
-  // Sanitiza a lista de datas: mantém só campos conhecidos.
+  // POST op=ativo -> torna este o curso aberto ao público
+  if (body.op === 'ativo') {
+    const { data, error } = await supabase.rpc('ftrails_set_ativo', { p_curso: curso });
+    if (error) { console.error('set_ativo error', error); return res.status(500).json({ error: 'falha' }); }
+    if (data && data.status === 'not_found') return res.status(404).json({ error: 'curso_nao_encontrado' });
+    return res.status(200).json({ status: 'ok', curso });
+  }
+
+  // POST (default) -> salva conteúdo/datas do curso
   let datas = null;
   if (Array.isArray(body.datas)) {
     datas = body.datas.slice(0, 12).map(x => ({
@@ -26,12 +48,7 @@ module.exports = async (req, res) => {
       oficina: !!(x && x.oficina)
     })).filter(x => x.d || x.s);
   }
-
   const str = (v, max) => (v == null ? null : String(v).slice(0, max || 400));
-
-  let supabase;
-  try { supabase = getSupabase(); }
-  catch (e) { return res.status(500).json({ error: e.message }); }
 
   const { data, error } = await supabase.rpc('ftrails_set_conteudo', {
     p_curso: curso,
