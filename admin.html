@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Painel · Inscrições FTrails · Gestão Universitária</title>
+<title>Painel · Central de Cursos FTrails · DataLab / UnB</title>
 <style>
   :root{--navy:#12356b;--navy-d:#0d2650;--teal:#16879b;--green:#1f8a5b;--amber:#e0a100;--ink:#1f2a44;--muted:#5b6a80;--line:#e3e9f4;--bg:#eef2fa;--card:#fff}
   *{box-sizing:border-box}
@@ -35,7 +35,22 @@
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
   .card h3{margin:0 0 4px;color:var(--navy);font-size:16px}
   .card .cap{color:var(--muted);font-size:13px;margin:0 0 14px}
-  /* mapa regiões (SVG do Brasil) */
+  /* central de cursos */
+  .ctabs{display:flex;flex-wrap:wrap;gap:10px}
+  .ctab{border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 14px;cursor:pointer;text-align:left;min-width:210px;flex:1 1 210px;font-family:inherit}
+  .ctab:hover{border-color:#c3d0e8}
+  .ctab.sel{border-color:var(--navy);box-shadow:0 0 0 2px rgba(18,53,107,.16)}
+  .ctab .nm{font-weight:800;color:var(--navy);font-size:13.5px;line-height:1.25}
+  .ctab .mt{font-size:11.5px;color:var(--muted);margin-top:5px}
+  .pill{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:999px;font-weight:800;letter-spacing:.2px;margin-top:7px}
+  .pill.pub{background:#e6f6ee;color:#146c47}
+  .pill.clo{background:#fdecec;color:#a13030}
+  .pill.off{background:#eef3fb;color:#5b6a80}
+  .pubbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+  .pubbar .txt{font-size:13.5px;color:var(--ink)}
+  .btn-pub{background:var(--green);color:#fff}
+  .btn-pub:disabled{opacity:.5;cursor:default}
+  /* listas / mapa / tabela */
   .mapa{width:100%;max-width:380px;margin:0 auto}
   .mapa svg{width:100%;height:auto;display:block}
   .mapa .rp{stroke:#fff;stroke-width:2.2;transition:fill .25s}
@@ -44,7 +59,6 @@
   .leg{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:14px;font-size:12px;color:var(--muted)}
   .leg .sc{display:flex;height:12px;border-radius:6px;overflow:hidden;width:150px}
   .leg .sc i{flex:1}
-  /* listas */
   .rowbar{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:14px}
   .rowbar .k{flex:0 0 42px;font-weight:700;color:var(--navy)}
   .rowbar .t{flex:1;background:#eef3fb;border-radius:6px;height:20px;overflow:hidden}
@@ -65,14 +79,22 @@
   .abtn.ok{background:#1f8a5b;color:#fff}
   .abtn.no{background:#f3f5f9;color:#8a3030;border:1px solid #e6c6c6}
   .abtn:disabled{opacity:.5;cursor:default}
-  /* comunicação */
+  /* comunicação / formulários */
   .msgcols{display:grid;grid-template-columns:1fr 1fr;gap:24px}
   .msgcols h4{margin:0 0 4px;color:var(--navy);font-size:14.5px}
   .flbl{display:block;font-size:12.5px;font-weight:600;color:var(--navy);margin:10px 0 4px}
-  .comm input,.comm select,.comm textarea{width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #cdd6e6;border-radius:9px;font-size:14px;font-family:inherit;background:#fff;color:var(--ink)}
-  .comm textarea{resize:vertical;min-height:96px}
+  .comm input,.comm select,.comm textarea,.edit input,.edit select,.edit textarea{width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #cdd6e6;border-radius:9px;font-size:14px;font-family:inherit;background:#fff;color:var(--ink)}
+  .comm textarea,.edit textarea{resize:vertical;min-height:70px}
   .comm .btn{background:var(--navy);color:#fff}
   .comm .btn.sec{background:#eef3fb;color:var(--navy);border:1px solid #d3e0f5}
+  /* editor de conteúdo */
+  .edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .edit-grid .full{grid-column:1/-1}
+  .edit label{font-size:12.5px;font-weight:600;color:var(--navy);display:block;margin:0 0 4px}
+  .dateRow{display:grid;grid-template-columns:1.1fr .7fr 1.5fr auto auto;gap:8px;align-items:center;margin-bottom:8px}
+  .dateRow .ofc{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);white-space:nowrap}
+  .dateRow .rm{background:#f7e9e9;color:#a13030;border:1px solid #edcccc;border-radius:8px;padding:8px 10px;cursor:pointer;font-weight:700}
+  .btn.sec{background:#eef3fb;color:var(--navy);border:1px solid #d3e0f5;border-radius:9px;padding:9px 14px;font-weight:600;cursor:pointer;font-size:13.5px}
   /* controle de encerramento */
   .ctrl-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
   .switch{position:relative;display:inline-block;width:54px;height:30px;flex:0 0 auto}
@@ -93,20 +115,20 @@
   .stepper .stp:hover{background:#0d2650}
   .stepper .stp:disabled{opacity:.45;cursor:default}
   .stepper .stp-val{min-width:56px;text-align:center;font-size:28px;font-weight:800;color:var(--navy)}
-  @media(max-width:560px){.vg-grid{grid-template-columns:1fr}}
+  @media(max-width:560px){.vg-grid{grid-template-columns:1fr}.dateRow{grid-template-columns:1fr 1fr;}.dateRow .ofc{grid-column:1/-1}}
   /* mapa de palavras */
   .wc{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:center;padding:14px 6px;line-height:1.15;min-height:120px}
   .wc span{font-weight:800;white-space:nowrap;transition:opacity .15s}
   .wc span:hover{opacity:.7}
   .cResult{display:none;margin-top:14px;padding:11px 14px;border-radius:9px;font-size:13.5px;background:#e6f6ee;border:1px solid #b7e4cd;color:#146c47}
   .cResult.warn{background:#fff4e5;border-color:#f2d9a8;color:#8a5a00}
-  @media(max-width:880px){.kpis{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}.msgcols{grid-template-columns:1fr}}
+  @media(max-width:880px){.kpis{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}.msgcols,.edit-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header>
   <div class="wrap">
-    <div><h1>Painel de Inscrições</h1><div class="sub">Curso 1 · IA na Gestão Universitária — FTrails / DataLab / UnB</div></div>
+    <div><h1>Central de Cursos · FTrails</h1><div class="sub" id="hdrSub">DataLab · Faculdade de Tecnologia · UnB</div></div>
     <div id="hdrActions" style="display:none">
       <button class="btn btn-l" id="btnExport">Baixar Excel</button>
       <button class="btn btn-l" id="btnRefresh">Atualizar</button>
@@ -125,19 +147,34 @@
 
 <main id="dash">
   <div class="wrap">
+
+    <!-- Central de cursos: seleção e curso aberto ao público -->
+    <div class="card" id="coursesCard" style="margin-bottom:22px">
+      <h3>Central de cursos</h3>
+      <p class="cap">Selecione um curso para ver seus dados, ajustar vagas, editar datas e conteúdo. O curso <strong>aberto ao público</strong> é o que aparece na página de pré-inscrição.</p>
+      <div class="ctabs" id="ctabs"></div>
+      <div class="pubbar">
+        <div class="txt" id="pubTxt">—</div>
+        <button class="btn btn-pub" id="btnAbrir">Tornar este o curso aberto ao público</button>
+      </div>
+      <div class="cResult" id="pubResult"></div>
+    </div>
+
     <div class="card ctrl" id="ctrlCard" style="margin-bottom:22px">
       <div class="ctrl-row">
         <div>
-          <h3 style="margin:0 0 3px">Encerrar inscrições</h3>
+          <h3 style="margin:0 0 3px">Encerrar inscrições deste curso</h3>
           <p class="cap" style="margin:0" id="ctrlHint">Carregando…</p>
         </div>
         <label class="switch"><input type="checkbox" id="swEncerrar"><span class="slider"></span></label>
       </div>
     </div>
+
     <div class="kpis" id="kpis"></div>
+
     <div class="card" id="vagasCtrl" style="margin-bottom:22px">
       <h3>Vagas por categoria</h3>
-      <p class="cap">Use os botões para aumentar ou diminuir as vagas. A mudança vale na hora para novas pré-inscrições.</p>
+      <p class="cap">Use os botões para aumentar ou diminuir as vagas deste curso. A mudança vale na hora para novas pré-inscrições.</p>
       <div class="vg-grid">
         <div class="vg-item">
           <div class="vg-top"><span class="vg-name">Vagas UnB (@unb.br)</span><span class="vg-occ" id="occ-unb">—</span></div>
@@ -150,6 +187,31 @@
       </div>
       <div class="cResult" id="vgResult"></div>
     </div>
+
+    <!-- Editor de datas e conteúdo da página de pré-inscrição -->
+    <div class="card edit" id="contentCard" style="margin-bottom:22px">
+      <h3>Datas e conteúdo da página (deste curso)</h3>
+      <p class="cap">Edite as datas e os textos que aparecem na página de pré-inscrição quando este curso está aberto ao público.</p>
+      <div class="edit-grid">
+        <div><label>Nome curto (badge/aba)</label><input id="ed-nome_curto" placeholder="Ex.: Curso 2 · Pesquisa, Ensino e Extensão"></div>
+        <div><label>Período (destaque)</label><input id="ed-periodo" placeholder="Ex.: 18/09 a 17/10/2026"></div>
+        <div class="full"><label>Título (H1 da página)</label><input id="ed-titulo"></div>
+        <div class="full"><label>Subtítulo</label><textarea id="ed-subtitulo"></textarea></div>
+        <div class="full"><label>Eixo / linha da trilha</label><textarea id="ed-eixo"></textarea></div>
+        <div><label>Período — complemento</label><input id="ed-periodo_sub" placeholder="Ex.: 4 sessões, sexta e sábados"></div>
+        <div><label>Pergunta aberta (final da inscrição)</label><input id="ed-pergunta"></div>
+        <div class="full"><label>Texto acima das datas</label><textarea id="ed-datas_lead"></textarea></div>
+        <div class="full"><label>Objetivo</label><textarea id="ed-objetivo"></textarea></div>
+        <div><label>Público interno (UnB)</label><textarea id="ed-publico_unb"></textarea></div>
+        <div><label>Público externo</label><textarea id="ed-publico_externo"></textarea></div>
+      </div>
+      <label style="display:block;font-size:12.5px;font-weight:700;color:var(--navy);margin:16px 0 8px">Datas / sessões</label>
+      <div id="datasEditor"></div>
+      <button class="btn sec" id="btnAddData" type="button" style="margin-top:4px">+ Adicionar sessão</button>
+      <div style="margin-top:16px"><button class="btn" id="btnSalvarConteudo" style="background:var(--navy);color:#fff">Salvar datas e conteúdo</button></div>
+      <div class="cResult" id="edResult"></div>
+    </div>
+
     <div class="cols">
       <div class="card">
         <h3>Mapa de inscritos por região</h3>
@@ -185,18 +247,18 @@
     </div>
 
     <div class="card" style="margin-top:22px">
-      <h3>Mapa de palavras — desafios na gestão</h3>
-      <p class="cap">Palavras mais citadas na resposta "maior dor na gestão universitária". O tamanho é proporcional à frequência.</p>
+      <h3>Mapa de palavras — pergunta aberta</h3>
+      <p class="cap">Palavras mais citadas na resposta da pergunta aberta deste curso. O tamanho é proporcional à frequência.</p>
       <div class="wc" id="wc"><p class="muted">Sem respostas ainda.</p></div>
     </div>
 
     <div class="card comm" style="margin-top:22px">
       <h3>Comunicação com inscritos</h3>
-      <p class="cap">Reenvie o e-mail de confirmação ou envie um comunicado. O envio depende do SMTP configurado na Vercel.</p>
+      <p class="cap">Reenvie o e-mail de confirmação ou envie um comunicado aos inscritos deste curso. O envio depende do SMTP configurado na Vercel.</p>
       <div class="msgcols">
         <div>
           <h4>Reenviar confirmação</h4>
-          <p class="cap">Redispara o e-mail padrão de confirmação para todos os inscritos <strong>confirmados</strong>.</p>
+          <p class="cap">Redispara o e-mail padrão de confirmação para todos os inscritos <strong>confirmados</strong> deste curso.</p>
           <button class="btn sec" id="btnResend">Reenviar confirmação aos confirmados</button>
         </div>
         <div>
@@ -225,7 +287,7 @@
       </div>
       <div class="card">
         <h3>Últimas inscrições</h3>
-        <p class="cap">50 registros mais recentes.</p>
+        <p class="cap">Registros mais recentes deste curso.</p>
         <div style="overflow:auto;max-height:360px">
           <table id="tbl"><thead><tr><th>Nome / e-mail</th><th>Instituição</th><th>UF</th><th>Cat.</th><th>Status</th><th>Ações</th></tr></thead><tbody></tbody></table>
         </div>
@@ -236,8 +298,14 @@
 
 <script>
   let PW = sessionStorage.getItem('ftrails_pw') || '';
+  let COURSES = [];          // visão geral de todos os cursos
+  let CURSO_SEL = '';        // curso selecionado no painel
   const limitesAtuais = { unb: 0, externo: 0 };
   const ocupadasAtuais = { unb: 0, externo: 0 };
+
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function cursoAtual(){ return COURSES.find(c=>c.curso===CURSO_SEL) || null; }
+  function q(u){ return u + (u.indexOf('?')>=0?'&':'?') + 'curso=' + encodeURIComponent(CURSO_SEL); }
 
   const REG_COLORS = ['#cfe0f5','#8fb4e6','#4f7fc9','#2b579b','#12356b'];
   function scaleColor(v, max){
@@ -246,11 +314,7 @@
     const idx = v===0 ? 0 : Math.min(REG_COLORS.length-1, Math.ceil(t*(REG_COLORS.length-1)));
     return REG_COLORS[idx];
   }
-
-  function buildLegend(){
-    const sc = document.getElementById('legsc');
-    sc.innerHTML = REG_COLORS.map(c=>'<i style="background:'+c+'"></i>').join('');
-  }
+  function buildLegend(){ document.getElementById('legsc').innerHTML = REG_COLORS.map(c=>'<i style="background:'+c+'"></i>').join(''); }
 
   function kpi(l,v,s,frac,color){
     let bar='';
@@ -258,6 +322,117 @@
     return '<div class="kpi"><div class="l">'+l+'</div><div class="v">'+v+'</div><div class="s">'+s+'</div>'+bar+'</div>';
   }
 
+  // ---------- Central de cursos ----------
+  function renderCourseTabs(){
+    const box = document.getElementById('ctabs');
+    box.innerHTML = COURSES.map(c=>{
+      const occ = (c.occ_unb||0)+(c.occ_externo||0);
+      const lim = (c.limite_unb||0)+(c.limite_externo||0);
+      let pill = c.ativo ? '<span class="pill pub">ABERTO AO PÚBLICO</span>'
+                         : (c.encerrado ? '<span class="pill clo">encerrado</span>' : '<span class="pill off">fechado</span>');
+      return '<button class="ctab'+(c.curso===CURSO_SEL?' sel':'')+'" data-c="'+esc(c.curso)+'">'+
+        '<div class="nm">'+esc(c.nome_curto||c.curso)+'</div>'+
+        '<div class="mt">'+occ+'/'+lim+' vagas · '+(c.total||0)+' inscritos</div>'+
+        pill+'</button>';
+    }).join('');
+    const cur = cursoAtual();
+    const pubTxt = document.getElementById('pubTxt');
+    const btnAbrir = document.getElementById('btnAbrir');
+    if(cur && cur.ativo){
+      pubTxt.innerHTML = '<strong>'+esc(cur.nome_curto)+'</strong> é o curso aberto ao público agora.';
+      btnAbrir.disabled = true; btnAbrir.textContent = 'Já é o curso aberto';
+    } else if(cur){
+      pubTxt.innerHTML = 'Este curso está <strong>fechado</strong>. Clique ao lado para torná-lo o curso aberto na página de pré-inscrição.';
+      btnAbrir.disabled = false; btnAbrir.textContent = 'Tornar este o curso aberto ao público';
+    }
+  }
+
+  function fillContentEditor(){
+    const cur = cursoAtual(); const c = (cur && cur.conteudo) || {};
+    const set = (id,val)=>{ const el=document.getElementById(id); if(el) el.value = val==null?'':val; };
+    set('ed-nome_curto', c.nome_curto); set('ed-titulo', c.titulo); set('ed-subtitulo', c.subtitulo);
+    set('ed-eixo', c.eixo); set('ed-periodo', c.periodo); set('ed-periodo_sub', c.periodo_sub);
+    set('ed-datas_lead', c.datas_lead); set('ed-pergunta', c.pergunta); set('ed-objetivo', c.objetivo);
+    set('ed-publico_unb', c.publico_unb); set('ed-publico_externo', c.publico_externo);
+    renderDatasEditor(Array.isArray(c.datas)?c.datas:[]);
+  }
+  function dateRowHtml(x){
+    x = x||{};
+    return '<div class="dateRow">'+
+      '<input class="dr-s" value="'+esc(x.s||'')+'" placeholder="Sessão 1">'+
+      '<input class="dr-d" value="'+esc(x.d||'')+'" placeholder="18/09">'+
+      '<input class="dr-h" value="'+esc(x.h||'')+'" placeholder="sexta · 13h–18h">'+
+      '<label class="ofc"><input type="checkbox" class="dr-o"'+(x.oficina?' checked':'')+'> oficina</label>'+
+      '<button type="button" class="rm">×</button>'+
+    '</div>';
+  }
+  function renderDatasEditor(arr){
+    document.getElementById('datasEditor').innerHTML = (arr.length?arr:[{}]).map(dateRowHtml).join('');
+  }
+  function collectDatas(){
+    return [...document.querySelectorAll('#datasEditor .dateRow')].map(r=>({
+      s: r.querySelector('.dr-s').value.trim(),
+      d: r.querySelector('.dr-d').value.trim(),
+      h: r.querySelector('.dr-h').value.trim(),
+      oficina: r.querySelector('.dr-o').checked
+    })).filter(x=>x.d||x.s);
+  }
+  document.getElementById('btnAddData').addEventListener('click', ()=>{
+    document.getElementById('datasEditor').insertAdjacentHTML('beforeend', dateRowHtml({}));
+  });
+  document.getElementById('datasEditor').addEventListener('click', (e)=>{
+    const b=e.target.closest('.rm'); if(!b) return; b.closest('.dateRow').remove();
+  });
+
+  function setEd(msg, warn){ const el=document.getElementById('edResult'); el.textContent=msg||''; el.style.display=msg?'block':'none'; el.className='cResult'+(warn?' warn':''); }
+  document.getElementById('btnSalvarConteudo').addEventListener('click', async ()=>{
+    const btn=document.getElementById('btnSalvarConteudo'); const old=btn.textContent;
+    const val=id=>{ const el=document.getElementById(id); return el?el.value.trim():''; };
+    const payload = {
+      curso: CURSO_SEL, nome_curto: val('ed-nome_curto'), titulo: val('ed-titulo'), subtitulo: val('ed-subtitulo'),
+      eixo: val('ed-eixo'), periodo: val('ed-periodo'), periodo_sub: val('ed-periodo_sub'),
+      datas_lead: val('ed-datas_lead'), pergunta: val('ed-pergunta'), objetivo: val('ed-objetivo'),
+      publico_unb: val('ed-publico_unb'), publico_externo: val('ed-publico_externo'), datas: collectDatas()
+    };
+    btn.disabled=true; btn.textContent='Salvando…'; setEd('', false);
+    try{
+      const r=await fetch('/api/admin-content',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':PW},body:JSON.stringify(payload)});
+      if(r.status===401){ logout('Senha incorreta.'); return; }
+      const j=await r.json();
+      if(j.status==='ok'){ setEd('Conteúdo salvo. Se este curso estiver aberto, a página de pré-inscrição já reflete a mudança.', false); await loadCourses(); }
+      else { setEd('Não foi possível salvar: '+(j.error||'erro'), true); }
+    }catch(e){ setEd('Falha de conexão. Tente novamente.', true); }
+    finally{ btn.disabled=false; btn.textContent=old; }
+  });
+
+  // Trocar curso selecionado
+  document.getElementById('ctabs').addEventListener('click', (e)=>{
+    const b=e.target.closest('.ctab'); if(!b) return;
+    CURSO_SEL = b.getAttribute('data-c');
+    renderCourseTabs(); fillContentEditor(); loadStats(); loadWordcloud(); updateHeader();
+  });
+
+  // Tornar curso aberto ao público
+  function setPub(msg, warn){ const el=document.getElementById('pubResult'); el.textContent=msg||''; el.style.display=msg?'block':'none'; el.className='cResult'+(warn?' warn':''); }
+  document.getElementById('btnAbrir').addEventListener('click', async ()=>{
+    const cur=cursoAtual(); if(!cur) return;
+    if(!confirm('Abrir "'+cur.nome_curto+'" ao público?\n\nA página de pré-inscrição passará a exibir este curso e ele ficará aberto. O curso que estava aberto deixará de aparecer.')) return;
+    const btn=document.getElementById('btnAbrir'); btn.disabled=true; btn.textContent='Abrindo…'; setPub('', false);
+    try{
+      const r=await fetch('/api/admin-active',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':PW},body:JSON.stringify({curso:CURSO_SEL})});
+      if(r.status===401){ logout('Senha incorreta.'); return; }
+      const j=await r.json();
+      if(j.status==='ok'){ setPub('Pronto! "'+cur.nome_curto+'" agora é o curso aberto ao público.', false); await loadCourses(); loadStats(); }
+      else { setPub('Não foi possível abrir: '+(j.error||'erro'), true); btn.disabled=false; }
+    }catch(e){ setPub('Falha de conexão. Tente novamente.', true); btn.disabled=false; }
+  });
+
+  function updateHeader(){
+    const cur=cursoAtual();
+    document.getElementById('hdrSub').textContent = cur ? ('Curso selecionado: '+cur.nome_curto) : 'DataLab · Faculdade de Tecnologia · UnB';
+  }
+
+  // ---------- Encerramento ----------
   function updateEncerrado(state){
     const sw = document.getElementById('swEncerrar');
     const hint = document.getElementById('ctrlHint');
@@ -265,12 +440,13 @@
     if(sw) sw.checked = !!state;
     if(card) card.classList.toggle('on', !!state);
     if(hint) hint.textContent = state
-      ? 'Inscrições ENCERRADAS — a página principal mostra "vagas esgotadas". Desative para reabrir.'
-      : 'Inscrições abertas. Ative para encerrar e mostrar "vagas esgotadas" na página principal.';
+      ? 'Inscrições ENCERRADAS. Se este for o curso aberto, a página mostra "vagas esgotadas". Desative para reabrir.'
+      : 'Inscrições abertas para este curso. Ative para encerrar e mostrar "vagas esgotadas" na página (quando este for o curso aberto).';
   }
+
+  // ---------- Dashboard do curso selecionado ----------
   function render(d){
     updateEncerrado(d.encerrado === true);
-    // KPIs
     const unbOc=(d.unb_confirmados||0)+(d.unb_pendentes||0), extOc=(d.externo_confirmados||0)+(d.externo_pendentes||0);
     const limUnb=Number(d.limite_unb)||0, limExt=Number(d.limite_externo)||0;
     document.getElementById('kpis').innerHTML =
@@ -280,17 +456,13 @@
       kpi('Vagas UnB', unbOc+'/'+limUnb, Math.max(0,limUnb-unbOc)+' restantes', limUnb?unbOc/limUnb:0, '#12356b') +
       kpi('Vagas externas', extOc+'/'+limExt, Math.max(0,limExt-extOc)+' restantes', limExt?extOc/limExt:0, '#e0a100');
 
-    // Contador de vagas (limites editáveis)
     limitesAtuais.unb = limUnb; limitesAtuais.externo = limExt;
     ocupadasAtuais.unb = unbOc; ocupadasAtuais.externo = extOc;
     const su=document.getElementById('lim-unb'), se=document.getElementById('lim-externo');
-    if(su) su.textContent = limUnb;
-    if(se) se.textContent = limExt;
+    if(su) su.textContent = limUnb; if(se) se.textContent = limExt;
     const ou=document.getElementById('occ-unb'), oe=document.getElementById('occ-externo');
-    if(ou) ou.textContent = unbOc+' ocupadas';
-    if(oe) oe.textContent = extOc+' ocupadas';
+    if(ou) ou.textContent = unbOc+' ocupadas'; if(oe) oe.textContent = extOc+' ocupadas';
 
-    // Mapa por região
     const reg = d.por_regiao || {};
     const REGS = ['Norte','Nordeste','Centro-Oeste','Sudeste','Sul'];
     const vals = REGS.map(r=>reg[r]||0);
@@ -303,21 +475,18 @@
       if(t) t.textContent = v;
     });
 
-    // UF
     const uf = d.por_uf || [];
     const ufMax = Math.max(1, ...uf.map(x=>x.n));
     document.getElementById('ufList').innerHTML = uf.length ? uf.map(x=>
       '<div class="rowbar"><div class="k">'+x.uf+'</div><div class="t"><i style="width:'+(x.n/ufMax*100)+'%"></i></div><div class="n">'+x.n+'</div></div>'
     ).join('') : '<p class="muted">Sem dados ainda.</p>';
 
-    // IP region
     const ir = d.por_ip_region || [];
     const irMax = Math.max(1, ...ir.map(x=>x.n));
     document.getElementById('ipList').innerHTML = ir.length ? ir.map(x=>
       '<div class="rowbar"><div class="k" style="flex:0 0 auto;min-width:42px">'+(x.regiao||'—')+'</div><div class="t"><i style="width:'+(x.n/irMax*100)+'%"></i></div><div class="n">'+x.n+'</div></div>'
     ).join('') : '<p class="muted">Sem dados ainda.</p>';
 
-    // tabela
     const rows = (d.ultimas||[]).map(r=>{
       const cat = r.categoria==='unb'?'<span class="tag unb">UnB</span>':'<span class="tag externo">Externo</span>';
       const st = r.status==='confirmed'?'<span class="tag confirmed">confirmado</span>':'<span class="tag pending">pendente</span>';
@@ -329,15 +498,36 @@
     document.querySelector('#tbl tbody').innerHTML = rows || '<tr><td colspan="6" class="muted">Nenhuma inscrição ainda.</td></tr>';
   }
 
-  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-
+  // ---------- Carregamento ----------
+  async function loadCourses(){
+    const r = await fetch('/api/admin-courses?pw='+encodeURIComponent(PW));
+    if(r.status===401){ logout('Senha incorreta.'); return false; }
+    if(!r.ok) throw new Error('falha');
+    const j = await r.json();
+    COURSES = j.cursos || [];
+    if(!CURSO_SEL || !COURSES.some(c=>c.curso===CURSO_SEL)){
+      const ativo = COURSES.find(c=>c.ativo) || COURSES[0];
+      CURSO_SEL = ativo ? ativo.curso : '';
+    }
+    renderCourseTabs(); fillContentEditor(); updateHeader();
+    return true;
+  }
+  async function loadStats(){
+    try{
+      const r = await fetch(q('/api/stats?pw='+encodeURIComponent(PW)));
+      if(r.status===401){ logout('Senha incorreta.'); return; }
+      if(!r.ok) throw new Error('falha');
+      const d = await r.json();
+      render(d);
+    }catch(e){ document.getElementById('loginErr').textContent='Não foi possível carregar. Tente novamente.'; }
+  }
   async function load(){
     try{
-      const r = await fetch('/api/stats?pw='+encodeURIComponent(PW));
-      if(r.status===401){ logout('Senha incorreta.'); return; }
-      if(!r.ok){ throw new Error('falha'); }
-      const d = await r.json();
-      showDash(); render(d); loadWordcloud();
+      const ok = await loadCourses();
+      if(ok===false) return;
+      showDash();
+      await loadStats();
+      loadWordcloud();
     }catch(e){ document.getElementById('loginErr').textContent='Não foi possível carregar. Tente novamente.'; }
   }
 
@@ -362,21 +552,21 @@
     load();
   });
   document.getElementById('pw').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('btnEntrar').click(); });
-  document.getElementById('btnRefresh').addEventListener('click', load);
+  document.getElementById('btnRefresh').addEventListener('click', ()=>{ loadCourses().then(()=>{ loadStats(); loadWordcloud(); }); });
   document.getElementById('btnSair').addEventListener('click', ()=>logout(''));
 
-  // ----- Download Excel (gerado no servidor) -----
+  // ----- Download Excel (curso selecionado) -----
   async function exportExcel(){
     const btn=document.getElementById('btnExport'); const old=btn.textContent;
     btn.disabled=true; btn.textContent='Gerando…';
     try{
-      const r=await fetch('/api/export', { headers:{'x-admin-password':PW} });
+      const r=await fetch(q('/api/export'), { headers:{'x-admin-password':PW} });
       if(r.status===401){ logout('Senha incorreta.'); return; }
       if(!r.ok) throw new Error('falha');
       const blob=await r.blob();
       const cd=r.headers.get('Content-Disposition')||'';
       const m=/filename="?([^"]+)"?/.exec(cd);
-      const name=(m&&m[1]) || 'inscritos_ftrails_gestao.xlsx';
+      const name=(m&&m[1]) || ('inscritos_ftrails_'+CURSO_SEL+'.xlsx');
       const url=URL.createObjectURL(blob);
       const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click();
       a.remove(); setTimeout(()=>URL.revokeObjectURL(url), 4000);
@@ -394,7 +584,7 @@
       if(delta < 0) setVg('Não dá para reduzir abaixo das '+min+' vagas já ocupadas nesta categoria.', true);
       return;
     }
-    const payload = { limite_unb: cat==='unb'?novo:limitesAtuais.unb, limite_externo: cat==='externo'?novo:limitesAtuais.externo };
+    const payload = { curso: CURSO_SEL, limite_unb: cat==='unb'?novo:limitesAtuais.unb, limite_externo: cat==='externo'?novo:limitesAtuais.externo };
     document.querySelectorAll('.stp').forEach(b=>b.disabled=true);
     try{
       const r=await fetch('/api/admin-limits',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':PW},body:JSON.stringify(payload)});
@@ -405,7 +595,7 @@
         document.getElementById('lim-unb').textContent=j.limite_unb;
         document.getElementById('lim-externo').textContent=j.limite_externo;
         setVg('Vagas atualizadas: UnB '+j.limite_unb+' · Externas '+j.limite_externo+'.', false);
-        load();
+        loadCourses(); loadStats();
       } else { setVg('Não foi possível atualizar: '+(j.error||'erro'), true); }
     }catch(e){ setVg('Falha de conexão. Tente novamente.', true); }
     finally{ document.querySelectorAll('.stp').forEach(b=>b.disabled=false); }
@@ -415,19 +605,19 @@
     ajustarVagas(b.getAttribute('data-cat'), parseInt(b.getAttribute('data-d'),10));
   });
 
-  // ----- Chave: encerrar inscrições -----
+  // ----- Chave: encerrar inscrições do curso selecionado -----
   document.getElementById('swEncerrar').addEventListener('change', async (e)=>{
     const sw = e.target; const desejado = sw.checked;
     const aviso = desejado
-      ? 'Encerrar as inscrições? A página principal passará a mostrar "vagas esgotadas" e novas pré-inscrições serão bloqueadas.'
-      : 'Reabrir as inscrições?';
+      ? 'Encerrar as inscrições deste curso? Se ele for o curso aberto ao público, a página passará a mostrar "vagas esgotadas".'
+      : 'Reabrir as inscrições deste curso?';
     if(!confirm(aviso)){ sw.checked = !desejado; return; }
     sw.disabled = true;
     try{
-      const r = await fetch('/api/admin-config', {method:'POST', headers:{'Content-Type':'application/json','x-admin-password':PW}, body: JSON.stringify({encerrado: desejado})});
+      const r = await fetch('/api/admin-config', {method:'POST', headers:{'Content-Type':'application/json','x-admin-password':PW}, body: JSON.stringify({curso:CURSO_SEL, encerrado: desejado})});
       if(r.status===401){ logout('Senha incorreta.'); return; }
       const j = await r.json();
-      if(j.status==='ok'){ updateEncerrado(j.encerrado === true); }
+      if(j.status==='ok'){ updateEncerrado(j.encerrado === true); loadCourses(); }
       else { alert('Não foi possível alterar: '+(j.error||'erro')); sw.checked = !desejado; }
     }catch(err){ alert('Falha de conexão. Tente novamente.'); sw.checked = !desejado; }
     finally{ sw.disabled = false; }
@@ -436,7 +626,7 @@
   // ----- Mapa de palavras -----
   async function loadWordcloud(){
     try{
-      const r=await fetch('/api/wordcloud',{headers:{'x-admin-password':PW}});
+      const r=await fetch(q('/api/wordcloud'),{headers:{'x-admin-password':PW}});
       if(!r.ok) return;
       const j=await r.json(); renderWordcloud(j.words||[]);
     }catch(e){}
@@ -459,7 +649,7 @@
   async function postComm(payload, btn){
     const old=btn.textContent; btn.disabled=true; btn.textContent='Enviando…'; setComm('', false);
     try{
-      const r=await fetch('/api/broadcast',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':PW},body:JSON.stringify(payload)});
+      const r=await fetch('/api/broadcast',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':PW},body:JSON.stringify(Object.assign({curso:CURSO_SEL}, payload))});
       if(r.status===401){ logout('Senha incorreta.'); return; }
       const j=await r.json();
       if(j.status==='no_smtp'){ setComm(j.message||'SMTP não configurado.', true); }
@@ -469,7 +659,7 @@
     finally{ btn.disabled=false; btn.textContent=old; }
   }
   document.getElementById('btnResend').addEventListener('click', ()=>{
-    if(!confirm('Reenviar o e-mail de confirmação para todos os inscritos confirmados?')) return;
+    if(!confirm('Reenviar o e-mail de confirmação para todos os inscritos confirmados deste curso?')) return;
     postComm({mode:'confirmacao', audience:'confirmados'}, document.getElementById('btnResend'));
   });
   document.getElementById('btnSend').addEventListener('click', ()=>{
@@ -477,7 +667,7 @@
     const message=document.getElementById('msgBody').value.trim();
     const audience=document.getElementById('msgAud').value;
     if(subject.length<2 || message.length<2){ setComm('Preencha o assunto e a mensagem.', true); return; }
-    if(!confirm('Enviar esta mensagem para o público selecionado?')) return;
+    if(!confirm('Enviar esta mensagem para o público selecionado deste curso?')) return;
     postComm({mode:'custom', audience, subject, message}, document.getElementById('btnSend'));
   });
 
@@ -490,7 +680,7 @@
       if(r.status===401){ logout('Senha incorreta.'); return; }
       const j = await r.json();
       if(j.status!=='ok'){ alert('Não foi possível concluir: '+(j.error||'erro')); [...row.querySelectorAll('.abtn')].forEach(b=>b.disabled=false); return; }
-      load();
+      loadStats(); loadCourses();
     }catch(e){ alert('Falha de conexão. Tente novamente.'); [...row.querySelectorAll('.abtn')].forEach(b=>b.disabled=false); }
   }
   document.getElementById('tbl').addEventListener('click', e=>{
@@ -500,7 +690,7 @@
 
   buildLegend();
   if(PW){ load(); }
-  setInterval(()=>{ if(PW && document.getElementById('dash').style.display==='block') load(); }, 30000);
+  setInterval(()=>{ if(PW && document.getElementById('dash').style.display==='block'){ loadStats(); } }, 30000);
 </script>
 </body>
 </html>
