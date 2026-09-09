@@ -1,4 +1,4 @@
-const { getSupabase, sendConfirmed, sendMessage, smtpReady } = require('../lib/util');
+const { getSupabase, resolveCurso, sendConfirmed, sendMessage, smtpReady } = require('../lib/util');
 
 const STATUS_BY_AUDIENCE = {
   todos: ['pending', 'confirmed'],
@@ -50,10 +50,11 @@ module.exports = async (req, res) => {
   try { supabase = getSupabase(); }
   catch (e) { return res.status(500).json({ error: e.message }); }
 
+  const curso = await resolveCurso(supabase, body.curso);
   const { data, error } = await supabase
     .from('ftrails_registrations')
     .select('nome,email,categoria')
-    .eq('curso', 'gestao')
+    .eq('curso', curso)
     .in('status', STATUS_BY_AUDIENCE[audience]);
 
   if (error) { console.error('broadcast select', error); return res.status(500).json({ error: 'falha' }); }

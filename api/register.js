@@ -1,7 +1,5 @@
 const { getSupabase, checkInstitutionalEmail, isValidCPF, UFS, VINCULOS } = require('../lib/util');
 
-const CURSO = 'gestao';
-
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -55,7 +53,7 @@ module.exports = async (req, res) => {
   if (bairro.length < 2) return res.status(400).json({ status: 'error', field: 'bairro', message: 'Informe o bairro.' });
   if (!UFS.includes(uf)) return res.status(400).json({ status: 'error', field: 'uf', message: 'Selecione a UF.' });
   if (municipio.length < 2) return res.status(400).json({ status: 'error', field: 'municipio', message: 'Informe o município.' });
-  if (desafio.length < 5) return res.status(400).json({ status: 'error', field: 'desafio', message: 'Conte, em poucas palavras, seu maior desafio na gestão universitária.' });
+  if (desafio.length < 5) return res.status(400).json({ status: 'error', field: 'desafio', message: 'Conte, em poucas palavras, o seu maior desafio.' });
 
   // Geolocalização a partir dos headers da Vercel
   const ip_country = req.headers['x-vercel-ip-country'] || null;
@@ -68,7 +66,7 @@ module.exports = async (req, res) => {
   catch (e) { return res.status(500).json({ status: 'error', message: e.message }); }
 
   const { data, error } = await supabase.rpc('ftrails_register', {
-    p_curso: CURSO, p_nome: nome, p_cpf: cpf, p_email: email, p_telefone: telefone,
+    p_nome: nome, p_cpf: cpf, p_email: email, p_telefone: telefone,
     p_instituicao: instituicao, p_vinculo: vinculo, p_cargo: cargo, p_uf: uf, p_municipio: municipio,
     p_ip_region: ip_region, p_ip_country: ip_country, p_ip_city: ip_city,
     p_data_nascimento: dataNascimento, p_usa_nome_social: usaNomeSocial, p_nome_social: nomeSocial,

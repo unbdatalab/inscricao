@@ -1,6 +1,6 @@
-const { getSupabase, resolveCurso } = require('../lib/util');
+const { getSupabase } = require('../lib/util');
 
-// Liga/desliga o encerramento das inscrições de um curso (protegido pela senha do painel).
+// Define qual curso fica ABERTO ao público (ativo) e o reabre. Protegido pela senha do painel.
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
 
@@ -13,15 +13,16 @@ module.exports = async (req, res) => {
   if (!expected) return res.status(500).json({ error: 'ADMIN_PASSWORD não configurada.' });
   if (String(pw) !== String(expected)) return res.status(401).json({ error: 'nao_autorizado' });
 
-  const encerrado = body.encerrado === true || body.encerrado === 'true' || body.encerrado === 'sim';
+  const curso = String(body.curso || '').trim();
+  if (!curso) return res.status(400).json({ error: 'curso_invalido' });
 
   let supabase;
   try { supabase = getSupabase(); }
   catch (e) { return res.status(500).json({ error: e.message }); }
 
-  const curso = await resolveCurso(supabase, body.curso);
-  const { data, error } = await supabase.rpc('ftrails_set_encerrado', { p_curso: curso, p_encerrado: encerrado });
-  if (error) { console.error('set_encerrado error', error); return res.status(500).json({ error: 'falha' }); }
+  const { data, error } = await supabase.rpc('ftrails_set_ativo', { p_curso: curso });
+  if (error) { console.error('set_ativo error', error); return res.status(500).json({ error: 'falha' }); }
+  if (data && data.status === 'not_found') return res.status(404).json({ error: 'curso_nao_encontrado' });
 
-  return res.status(200).json({ status: 'ok', curso, encerrado: data.encerrado === true });
+  return res.status(200).json({ status: 'ok', curso });
 };

@@ -1,4 +1,4 @@
-const { getSupabase } = require('../lib/util');
+const { getSupabase, resolveCurso } = require('../lib/util');
 
 // Palavras muito comuns do português (e genéricas do tema) que não agregam ao mapa.
 const STOP = new Set(('a o e é de do da das dos em no na nas nos um uma uns umas para por com sem sobre ' +
@@ -8,7 +8,7 @@ const STOP = new Set(('a o e é de do da das dos em no na nas nos um uma uns uma
   'era são está estão sendo entre até então também só apenas cada todo toda todos todas nada tudo algo ' +
   'alguns algumas nenhum nenhuma outro outra outros outras mesmo mesma vez vezes ainda aqui ali lá ' +
   'eu tu ele ela nós vós eles elas me te lhe nos vos se meu teu ' +
-  'na gestão universitária universidade instituição instituições ' +
+  'universidade universitária instituição instituições ' +
   'maior dor desafio desafios dificuldade dificuldades problema problemas ' +
   'muita muitas muitos pouco pouca poucos poucas ' +
   'ter fazer poder dever ir vir dar').split(/\s+/).filter(Boolean));
@@ -24,10 +24,11 @@ module.exports = async (req, res) => {
   try { supabase = getSupabase(); }
   catch (e) { return res.status(500).json({ error: e.message }); }
 
+  const curso = await resolveCurso(supabase, req.query && req.query.curso);
   const { data, error } = await supabase
     .from('ftrails_registrations')
     .select('desafio')
-    .eq('curso', 'gestao')
+    .eq('curso', curso)
     .neq('status', 'cancelled')
     .not('desafio', 'is', null);
 
