@@ -66,7 +66,7 @@ module.exports = async (req, res) => {
   catch (e) { return res.status(500).json({ status: 'error', message: e.message }); }
 
   const { data, error } = await supabase.rpc('ftrails_register', {
-    p_nome: nome, p_cpf: cpf, p_email: email, p_telefone: telefone,
+    p_curso: null, p_nome: nome, p_cpf: cpf, p_email: email, p_telefone: telefone,
     p_instituicao: instituicao, p_vinculo: vinculo, p_cargo: cargo, p_uf: uf, p_municipio: municipio,
     p_ip_region: ip_region, p_ip_country: ip_country, p_ip_city: ip_city,
     p_data_nascimento: dataNascimento, p_usa_nome_social: usaNomeSocial, p_nome_social: nomeSocial,
