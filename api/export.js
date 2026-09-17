@@ -2,6 +2,7 @@ const XLSX = require('xlsx');
 const { getSupabase, resolveCurso } = require('../lib/util');
 
 const VINCULO_LABEL = {
+  'docente': 'Docente',
   'tae': 'Servidor(a) técnico-administrativo(a)',
   'docente-gestor': 'Docente em função de gestão',
   'externo': 'Gestor(a)/servidor(a) de outra instituição',
